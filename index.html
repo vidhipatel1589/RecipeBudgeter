@@ -7,28 +7,188 @@
     rel='stylesheet'>
 </head>
 <body>
+
+    <!-- navigation bar -->
+    <nav class="navbar" id="navbar" style="display: none;">
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#add-recipe">Add Recipe</a></li>
+            <li><a href="#view-recipes">View Recipes</a></li>
+            <li><a href="#manage-account">Manage Account</a></li>
+        </ul>
+    </nav>
+
     <div class="wrapper">
-        <h1 class="Title">Recipe Budgeter</h1>
-        <form action="">
-            <h1>Login</h1>
-            <div class="input-box">
-                <input type="username" placeholder="Username/Email"
-                required>
-                <i class='bx bxs-user'></i>
-            </div>    
+        <form id="loginForm"> <!--added it to be a login form -->
+                <h1 class="Title">Recipe Budgeter</h1>
+                <h1 class="Subtitle">Login</h1>
+                <div class="input-box">
+                    <input type="text" id="username" placeholder="Username/Email"
+                           required> <!--changed type to text so it wud work w js-->
+                    <i class='bx bxs-user'></i>
+                </div>
 
-            <div class="input-box">
-                <input type="password"
-                placeholder="Password" required>
-                <i class='bx bxs-lock-alt'></i>
-            </div>
+                <div class="input-box">
+                    <input type="password" id="password"
+                           placeholder="Password" required>
+                    <i class='bx bxs-lock-alt'></i>
+                </div>
 
-            <button type="Submit" class="login-button">Login</button>
+                <button type="submit" class="login-button">Login</button>
 
-            <div class="register">
-                <a href="#">Create Account</a>
-            </div>    
+                <div class="register">
+                    <a href="#" onclick="showSignUp()">Create Account</a>
+                </div>
+            </form>
+
+        <!-- Sign Up Page -->
+        <div class="wrapper"> 
+            <form id="signupForm" style="display: none;">
+                    <h1 class="Title">Recipe Budgeter</h1>
+                    <h1 class="Subtitle">Sign Up</h1>
+
+                <div class="input-box">
+                    <input type="text" id="name" placeholder="Name" required>
+                    <i class="'bx bxs-evelope"></i>
+                </div>  
+
+                <div class="input-box">
+                    <input type="text" id="newUsername" placeholder="Username" required>
+                    <i class='bx bxs-user'></i>
+                <div> 
+
+                <div class="input-box">
+                    <input type="password" id="newPassword" placeholder="Password" required>
+                    <i class="bx bxs-lock-alt"></i>
+                </div>
+
+                <div class="input-box">
+                    <input type="password" id="confirmpassword" placeholder="Confirm Password" required>
+                    <i class='bx bxs-lock-alt'></i>
+                </div>     
+            
+                <button type="submit" class="login-button">Sign Up</button>
+
+                <div class="register">
+                    <a href="#" onclick="showLogin()">Already have an account? Login</a>
+                </div>    
         </form>
-    </div>   
-</body>
-</html>
+    </div>             
+
+        <!-- for recipe page -->
+        <div class="add-recipe-section" id="add-recipe" style="display: none;">
+            <h2>Add Your Recipe</h2>
+            <form action="" class="add-recipe-entry">
+                <div class="input-box">
+                    <input type="text" placeholder="Recipe Name" required>
+                </div>
+                <div class="ingredients-list">
+                    <div class="ingredient">
+                        <input type="text" id="ingredientInput" placeholder="Ingredient" required oninput="filterIngredients()">
+                        <div class="dropdown-content" id="dropdownContent"></div>
+                        </div>
+                    <input type="number" placeholder="Quantity" required>
+                    <select>
+                        <option value="Liters">Liters</option>  <!--are these the values were using?-->
+                        <option value="Pounds">Pounds</option>
+                        <option value="Items">Items</option>    <!--if the ingredient not in liters or pounds-->
+                    </select>
+                </div>
+                <button type="button" onclick="addIngredient()">Add Another Ingredient</button>
+                <button type="submit" class="save-button">Save Recipe</button>
+            </form>
+        </div>
+
+
+        <script>
+            //switch to signup form
+            function showSignUp() 
+            {
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('signupForm').style.display = 'block';
+            }
+
+            //switch to login form
+            function showLogin()
+            {
+                document.getElementById('signupForm').style.display = 'none';
+                document.getElementById('loginForm').style.display = 'block';
+            }
+            //test to check if username and password work
+            function validateLogin(username, password) {
+                return username === "username" && password === "password";
+            }
+
+            //handles the login function
+            document.getElementById('loginForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                if (validateLogin(username, password)) {
+                    //navigation bar becomes visible after logging in
+                    document.getElementById('navbar').style.display = 'block';
+                    document.getElementById('add-recipe').style.display = 'block';
+                    //login form goes away after logging in
+                    document.querySelector('.wrapper').style.display = 'none';
+                } else {
+                    alert('Invalid username or password. Please try again.');
+                }
+            });
+
+
+            // temporary list of ingredients, get from database instead later
+            const ingredients = [
+                "salt",
+                "pepper",
+                "eggs",
+                "butter",
+                "rice",
+                "spinach",
+                "onion",
+                "tomato",
+                "olive oil",
+                "chicken"
+            ];
+
+            //ik it looks ugly ill fix it later >.<
+
+            //when user types, it'll find the ingredient in the list
+            function filterIngredients() {
+                const input = document.getElementById('ingredientInput');
+                const filter = input.value.toLowerCase();
+                const dropdown = document.getElementById('dropdownContent');
+                dropdown.innerHTML = ''; // Clear previous results
+
+                if (filter) {
+                    const filteredIngredients =ingredients.filter(ingredient=>ingredient.toLowerCase().includes(filter));
+
+                    filteredIngredients.forEach(ingredient => {
+                        const div = document.createElement('div');
+                        div.textContent = ingredient;
+                        div.onclick =() => selectIngredient(ingredient);
+                        dropdown.appendChild(div);
+                    });
+
+                    //show list
+                    dropdown.style.display = filteredIngredients.length > 0 ? 'block' : 'none';
+                } else {
+                    dropdown.style.display = 'none'; //if none match
+                }
+            }
+
+            //choose from dropdown list
+            function selectIngredient(ingredient) {
+                document.getElementById('ingredientInput').value = ingredient;
+                document.getElementById('dropdownContent').style.display = 'none';
+            }
+
+
+            //need to add function add ingredients
+
+        </script>
+
+
+
+    </body >
+    </html >

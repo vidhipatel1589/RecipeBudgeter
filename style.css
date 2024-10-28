@@ -20,7 +20,10 @@ body {
   background: transparent;
   color: #fff;
   border-radius: 10px;
-  padding: 30px;
+  margin-top: -150px;
+  padding: 20px 0;
+  justify-content: center;
+  align-items: center;
 }
 
 .wrapper h1 {
