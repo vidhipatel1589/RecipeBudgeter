@@ -8,24 +8,13 @@
 </head>
 <body>
 
-    <!-- navigation bar -->
-    <nav class="navbar" id="navbar" style="display: none;">
-        <ul>
-            <li><a href="#home">Home</a></li>
-            <li><a href="#add-recipe">Add A New Recipe</a></li>
-            <li><a href="#view-recipes">Update A Recipe</a></li>
-            <li><a href="#view-recipe-cost">View Recipe Cost</a></li>
-        </ul>
-    </nav>
-
     <div class="wrapper">
         <h1 class="Title">Recipe Budgeter</h1>
         <form id="loginForm">
-            <!--added it to be a login form -->
             <h1>Login</h1>
             <div class="input-box">
                 <input type="text" id="username" placeholder="Username/Email"
-                       required> <!--changed type to text so it wud work w js-->
+                       required>
                 <i class='bx bxs-user'></i>
             </div>
 
@@ -75,6 +64,16 @@
             </div>    
         </form>
     </div>
+
+    <!-- navigation bar -->
+    <nav class="navbar" id="navbar" style="display: none;">
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#add-recipe">Add A New Recipe</a></li>
+            <li><a href="#view-recipes">Update A Recipe</a></li>
+            <li><a href="#view-recipe-cost">View Recipe Cost</a></li>
+        </ul>
+    </nav>
 
     <!------------------------------------------------------------------------------------------->
     <!-- for home page -->
@@ -394,14 +393,12 @@
         if (!recipes[recipeName]) {
         recipes[recipeName] = { name: recipeName, ingredients: newIngredients };
         alert('Recipe added successfully!');
-        populateDropdown(); // Update dropdown for view/recipe update section
-        populateRecipeCostDropdown(); // Update dropdown for cost section
+        populateDropdown(); 
+        populateRecipeCostDropdown(); 
         }   else {
         alert('A recipe with this name already exists.');
     }
 }
-
-        //say recipe is saved
         function saveRecipe() {
             const recipeName = document.getElementById('recipeName').value;
             const ingredientsList = document.getElementById('ingredient-list').children;
