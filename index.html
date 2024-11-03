@@ -3,8 +3,8 @@
 <head>
     <title>Recipe Budgeter</title>
     <link rel="stylesheet" href="style.css">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' 
-    rel='stylesheet'>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css'
+          rel='stylesheet'>
 </head>
 <body>
 
@@ -12,183 +12,467 @@
     <nav class="navbar" id="navbar" style="display: none;">
         <ul>
             <li><a href="#home">Home</a></li>
-            <li><a href="#add-recipe">Add Recipe</a></li>
-            <li><a href="#view-recipes">View Recipes</a></li>
-            <li><a href="#manage-account">Manage Account</a></li>
+            <li><a href="#add-recipe">Add A New Recipe</a></li>
+            <li><a href="#view-recipes">Update A Recipe</a></li>
+            <li><a href="#view-recipe-cost">View Recipe Cost</a></li>
         </ul>
     </nav>
 
     <div class="wrapper">
-        <form id="loginForm"> <!--added it to be a login form -->
-                <h1 class="Title">Recipe Budgeter</h1>
-                <h1 class="Subtitle">Login</h1>
-                <div class="input-box">
-                    <input type="text" id="username" placeholder="Username/Email"
-                           required> <!--changed type to text so it wud work w js-->
-                    <i class='bx bxs-user'></i>
-                </div>
+        <h1 class="Title">Recipe Budgeter</h1>
+        <form id="loginForm">
+            <!--added it to be a login form -->
+            <h1>Login</h1>
+            <div class="input-box">
+                <input type="text" id="username" placeholder="Username/Email"
+                       required> <!--changed type to text so it wud work w js-->
+                <i class='bx bxs-user'></i>
+            </div>
 
-                <div class="input-box">
-                    <input type="password" id="password"
-                           placeholder="Password" required>
-                    <i class='bx bxs-lock-alt'></i>
-                </div>
+            <div class="input-box">
+                <input type="password" id="password"
+                       placeholder="Password" required>
+                <i class='bx bxs-lock-alt'></i>
+            </div>
 
-                <button type="submit" class="login-button">Login</button>
+            <button type="submit" class="login-button">Login</button>
 
-                <div class="register">
-                    <a href="#" onclick="showSignUp()">Create Account</a>
-                </div>
-            </form>
-
-        <!-- Sign Up Page -->
-        <div class="wrapper"> 
-            <form id="signupForm" style="display: none;">
-                    <h1 class="Title">Recipe Budgeter</h1>
-                    <h1 class="Subtitle">Sign Up</h1>
-
-                <div class="input-box">
-                    <input type="text" id="name" placeholder="Name" required>
-                    <i class="'bx bxs-evelope"></i>
-                </div>  
-
-                <div class="input-box">
-                    <input type="text" id="newUsername" placeholder="Username" required>
-                    <i class='bx bxs-user'></i>
-                <div> 
-
-                <div class="input-box">
-                    <input type="password" id="newPassword" placeholder="Password" required>
-                    <i class="bx bxs-lock-alt"></i>
-                </div>
-
-                <div class="input-box">
-                    <input type="password" id="confirmpassword" placeholder="Confirm Password" required>
-                    <i class='bx bxs-lock-alt'></i>
-                </div>     
-            
-                <button type="submit" class="login-button">Sign Up</button>
-
-                <div class="register">
-                    <a href="#" onclick="showLogin()">Already have an account? Login</a>
-                </div>    
+            <div class="register">
+                <a href="#" onclick="showSignup()">Create Account</a>
+            </div>
         </form>
-    </div>             
+    </div>
 
-        <!-- for recipe page -->
-        <div class="add-recipe-section" id="add-recipe" style="display: none;">
-            <h2>Add Your Recipe</h2>
-            <form action="" class="add-recipe-entry">
-                <div class="input-box">
-                    <input type="text" placeholder="Recipe Name" required>
-                </div>
-                <div class="ingredients-list">
-                    <div class="ingredient">
-                        <input type="text" id="ingredientInput" placeholder="Ingredient" required oninput="filterIngredients()">
-                        <div class="dropdown-content" id="dropdownContent"></div>
-                        </div>
+    <div class="wrapper" id="signupWrapper" style="display: none;"> 
+        <form id="signupForm">
+            <h1 class="Title">Recipe Budgeter</h1>
+            <h1 class="Subtitle">Sign Up</h1>
+
+            <div class="input-box">
+                <input type="text" id="name" placeholder="Name" required>
+                <i class='bx bxs-envelope'></i>
+            </div>  
+
+            <div class="input-box">
+                <input type="text" id="newUsername" placeholder="Username" required>
+                <i class='bx bxs-user'></i>
+            </div> 
+
+            <div class="input-box">
+                <input type="password" id="newPassword" placeholder="Password" required>
+                <i class="bx bxs-lock-alt"></i>
+            </div>
+
+            <div class="input-box">
+                <input type="password" id="confirmpassword" placeholder="Confirm Password" required>
+                <i class='bx bxs-lock-alt'></i>
+            </div>     
+            
+            <button type="submit" class="login-button">Sign Up</button>
+
+            <div class="register">
+                <a href="#" onclick="showLogin()">Already have an account? Login</a>
+            </div>    
+        </form>
+    </div>
+
+    <!------------------------------------------------------------------------------------------->
+    <!-- for home page -->
+    <div class="section" id="home" style="display: none;">
+        <h2>Welcome to Recipe Budgeter</h2>
+        <h1>Here are your recipes!</h1>
+        <p>Omelet</p>
+        <p>Chicken and Rice</p>
+    </div>
+
+    <!------------------------------------------------------------------------------------------->
+    <!-- for recipe page -->
+    <div class="section" id="add-recipe" style="display: none;">
+        <h2>Add Your Recipe</h2>
+        <form action="" class="add-recipe-entry">
+            <div class="input-box">
+                <input type="text" placeholder="Recipe Name" required>
+            </div>
+            <div class="ingredients-list" id="ingredients-list">
+                <div class="ingredient">
+                    <input type="text" id="ingredientInput" placeholder="Ingredient" required oninput="filterIngredients()">
                     <input type="number" placeholder="Quantity" required>
                     <select>
-                        <option value="Liters">Liters</option>  <!--are these the values were using?-->
+                        <option value="Units">Units</option>
+                        <option value="Cups">Cups</option>
                         <option value="Pounds">Pounds</option>
-                        <option value="Items">Items</option>    <!--if the ingredient not in liters or pounds-->
+                        <option value="Ounces">Ounces</option>
                     </select>
                 </div>
-                <button type="button" onclick="addIngredient()">Add Another Ingredient</button>
-                <button type="submit" class="save-button">Save Recipe</button>
-            </form>
+            </div>
+
+            <button type="button" onclick="addIngredient()">Add Another Ingredient</button>
+            <button type="button" onclick="saveNewRecipe()">Save Recipe</button>
+        </form>
+    </div>
+
+    <!------------------------------------------------------------------------------------------->
+    <!-- for recipes section -->
+    <div class="section" id="view-recipes" style="display: none;">
+        <h2>List of Recipes</h2>
+        <!-- select recipe -->
+        <select id="chooseRecipeUpdate" onchange="loadRecipeData()">
+            <option value="">Select a recipe</option>
+        </select>
+
+        <!-- to allow update recipe -->
+        <form id="updateRecipeForm" style="display: none;">
+            <h1>
+                <input type="text" id="recipeName" required>
+            </h1>
+
+            <div class="ingredients-list" id="ingredient-list">
+                <div class="ingredient">
+                    <input type="text" id="ingredientInput" placeholder="Ingredient" required oninput="filterIngredients()">
+                    <input type="number" placeholder="Quantity" required>
+                    <select>
+                        <option value="Units">Units</option>
+                        <option value="Cups">Cups</option>
+                        <option value="Pounds">Pounds</option>
+                        <option value="Ounces">Ounces</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="button" onclick="addAnotherIngredient()">Add Another Ingredient</button>
+            <button type="button" onclick="saveRecipe()">Save Recipe</button>
+        </form>
+    </div>
+
+    <!------------------------------------------------------------------------------------------->
+    <!-- for recipe cost section -->
+    <div class="section" id="view-recipe-cost" style="display: none;">
+        <h2>Recipe Cost</h2>
+        
+        <!-- choose recipe to see cost -->
+        <select id="chooseRecipeCost" onchange="viewRecipeCost()">
+            <option value="">Select a recipe</option>
+        </select>
+
+        <!-- see details -->
+        <div id="recipeCostDetails" style="display: none;">
+            <h3 id="chosenRecipeName"></h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ingredient</th>
+                        <th>Quantity</th>
+                        <th>Unit</th>
+                        <th>Price</th>
+                        <th>Availability</th>
+                    </tr>
+                </thead>
+                <tbody id="ingredientCostList">
+                    <!-- Populated with JS -->
+                </tbody>
+            </table>
+            <h4>Total Cost: <span id="totalCost"></span></h4>
         </div>
+    </div>
 
+    <!------------------------------------------------------------------------------------------->
 
-        <script>
-            //switch to signup form
-            function showSignUp() 
-            {
-                document.getElementById('loginForm').style.display = 'none';
-                document.getElementById('signupForm').style.display = 'block';
+    <script>
+        //test to check if username and password work
+        function validateLogin(username, password) {
+            return username === "username" && password === "password";
+        }
+
+        //handles the login function
+        document.getElementById('loginForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (validateLogin(username, password)) {
+                //navigation bar becomes visible after logging in
+                document.getElementById('navbar').style.display = 'block';
+                showSection('home');    //open at home page
+                //login form goes away after logging in
+                document.querySelector('.wrapper').style.display = 'none';
+            } else {
+                alert('Invalid username or password. Please try again.');
             }
+        });
 
-            //switch to login form
-            function showLogin()
-            {
-                document.getElementById('signupForm').style.display = 'none';
-                document.getElementById('loginForm').style.display = 'block';
-            }
-            //test to check if username and password work
-            function validateLogin(username, password) {
-                return username === "username" && password === "password";
-            }
+        function showLogin() {
+            document.getElementById('signupWrapper').style.display = 'none';
+            document.querySelector('.wrapper').style.display = 'block';
+        }
 
-            //handles the login function
-            document.getElementById('loginForm').addEventListener('submit', function (event) {
-                event.preventDefault();
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
+        function showSignup() {
+            document.querySelector('.wrapper').style.display = 'none';
+            document.getElementById('signupWrapper').style.display = 'block';
+        }
 
-                if (validateLogin(username, password)) {
-                    //navigation bar becomes visible after logging in
-                    document.getElementById('navbar').style.display = 'block';
-                    document.getElementById('add-recipe').style.display = 'block';
-                    //login form goes away after logging in
-                    document.querySelector('.wrapper').style.display = 'none';
-                } else {
-                    alert('Invalid username or password. Please try again.');
-                }
+        //hide other pages when switching through pages on nav bar
+        function showSection(sectionId) {
+            //get sections
+            const sections = document.querySelectorAll('.section');
+
+            //hide other sections
+            sections.forEach(section => {
+                section.style.display = 'none';
             });
 
+            //show selected section
+            document.getElementById(sectionId).style.display = 'block';
+        }
 
-            // temporary list of ingredients, get from database instead later
-            const ingredients = [
-                "salt",
-                "pepper",
-                "eggs",
-                "butter",
-                "rice",
-                "spinach",
-                "onion",
-                "tomato",
-                "olive oil",
-                "chicken"
-            ];
+        ////////////////////////////////////////////////////////////////////////////////////////
 
-            //ik it looks ugly ill fix it later >.<
+        // temporary list of ingredients, get from database instead later
+        const ingredients = [
+            "Salt",
+            "Pepper",
+            "Eggs",
+            "Butter",
+            "Rice",
+            "Spinach",
+            "Onion",
+            "Tomato",
+            "Olive oil",
+            "Chicken"
+        ];
 
-            //when user types, it'll find the ingredient in the list
-            function filterIngredients() {
-                const input = document.getElementById('ingredientInput');
-                const filter = input.value.toLowerCase();
-                const dropdown = document.getElementById('dropdownContent');
-                dropdown.innerHTML = ''; // Clear previous results
+        // temporary list of recipes, get from database later
+        const recipes = {
+            "Omelet": { name: "Omelet", ingredients: [{ ingredient: "Eggs", quantity: 2, unit: "Units", price: 0.50, available: true }, { ingredient: "spinach", quantity: 10, unit: "Ounces", price: 0.20, available: true }] },
+            "Chicken and Rice": { name: "Chicken and Rice", ingredients: [{ ingredient: "chicken", quantity: 1, unit: "Pounds",available: false }, { ingredient: "rice", quantity: 1, unit: "Cups", price: 1.20, available: true }] }, 
+        };
 
-                if (filter) {
-                    const filteredIngredients =ingredients.filter(ingredient=>ingredient.toLowerCase().includes(filter));
+        ////////////////////////////////////////////////////////////////////////////////////////
 
-                    filteredIngredients.forEach(ingredient => {
-                        const div = document.createElement('div');
-                        div.textContent = ingredient;
-                        div.onclick =() => selectIngredient(ingredient);
-                        dropdown.appendChild(div);
-                    });
+        document.querySelectorAll('.navbar a').forEach(link => {
+            link.addEventListener('click', function (event) {
+                event.preventDefault();
+                const targetSection = this.getAttribute('href').substring(1);
+                showSection(targetSection);
+            });
+        });
 
-                    //show list
-                    dropdown.style.display = filteredIngredients.length > 0 ? 'block' : 'none';
-                } else {
-                    dropdown.style.display = 'none'; //if none match
+        ////////////////////////////////////////////////////////////////////////////////////////
+
+        //when user types, it'll find the ingredient in the list
+        function filterIngredients() {
+            const input = document.getElementById('ingredientInput');
+            const filter = input.value.toLowerCase();
+            const dropdown = document.getElementById('dropdownContent');
+            dropdown.innerHTML = ''; // Clear previous results
+
+            if (filter) {
+                const filteredIngredients = ingredients.filter(ingredient => ingredient.toLowerCase().includes(filter));
+
+                filteredIngredients.forEach(ingredient => {
+                    const div = document.createElement('div');
+                    div.textContent = ingredient;
+                    div.onclick = () => selectIngredient(ingredient);
+                    dropdown.appendChild(div);
+                });
+
+                //show list
+                dropdown.style.display = filteredIngredients.length > 0 ? 'block' : 'none';
+            } else {
+                dropdown.style.display = 'none'; //if none match
+            }
+        }
+
+        //choose from dropdown list
+        function selectIngredient(ingredient) {
+            document.getElementById('ingredientInput').value = ingredient;
+            document.getElementById('dropdownContent').style.display = 'none';
+        }
+
+        //to add another ingredient when listing ingredients for new recipe
+        function addIngredient() {
+            const ingredientsList = document.getElementById('ingredients-list');
+
+            const ingredientDiv = document.createElement('div');
+            ingredientDiv.className = 'ingredient';
+
+            //fields for new ingredient
+            ingredientDiv.innerHTML = `
+            <input type="text" placeholder="Ingredient" required oninput="filterIngredients()">
+            <input type="number" placeholder="Quantity" required>
+            <select>
+                <option value="Units">Units</option>
+                <option value="Cups">Cups</option>
+                <option value="Pounds">Pounds</option>
+                <option value="Ounces">Ounces</option>
+            </select>
+        `;
+
+            ingredientsList.appendChild(ingredientDiv);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////
+
+        //dropdown for recipes
+        function populateDropdown() {
+            const dropdown = document.getElementById('chooseRecipeUpdate');
+            dropdown.innerHTML = ''; // Clear the previous options
+            const uniqueRecipes = new Set(); // Use a Set to track unique recipe names
+
+            for (let recipeName in recipes) {
+                if (!uniqueRecipes.has(recipeName)) { // Check for duplicates
+                    uniqueRecipes.add(recipeName);
+                    const option = document.createElement('option');
+                    option.value = recipeName;
+                    option.textContent = recipeName;
+                    dropdown.appendChild(option);
                 }
             }
+        }
+        populateDropdown();
 
-            //choose from dropdown list
-            function selectIngredient(ingredient) {
-                document.getElementById('ingredientInput').value = ingredient;
-                document.getElementById('dropdownContent').style.display = 'none';
+        //get list of recipes to choose from
+        function loadRecipeData() {
+            const chosenRecipeName = document.getElementById('chooseRecipeUpdate').value;
+            if (chosenRecipeName) {
+                const recipe = recipes[chosenRecipeName];
+                document.getElementById('recipeName').value = recipe.name;
+
+                //clear out previous
+                const ingredientsList = document.getElementById('ingredient-list');
+                ingredientsList.innerHTML = '';
+
+                //list out the ingredients
+                recipe.ingredients.forEach((ingredient, index) => {
+                    const ingredientDiv = document.createElement('div');
+                    ingredientDiv.className = 'ingredient-entry';
+                    ingredientDiv.innerHTML = `
+                                        <input type="text" value="${ingredient.ingredient}" class="ingredient-name">
+                                        <input type="number" value="${ingredient.quantity}" class="ingredient-quantity">
+                                        <input type="text" value="${ingredient.unit}" class="ingredient-unit">
+                                    `;
+                    ingredientsList.appendChild(ingredientDiv);
+                });
+
+                //show form to update recipe
+                document.getElementById('updateRecipeForm').style.display = 'block';
+            } else {
+                //clear if no recipe chosen
+                document.getElementById('updateRecipeForm').style.display = 'none';
             }
+        }
 
+        //add another ingredient to recipe
+        function addAnotherIngredient() {
+            const ingredientsList = document.getElementById('ingredient-list');
 
-            //need to add function add ingredients
+            const ingredientDiv = document.createElement('div');
+            ingredientDiv.className = 'ingredient-entry';
+            ingredientDiv.innerHTML = `
+                <input type="text" class="ingredient-name" placeholder="Ingredient" required>
+                <input type="number" class="ingredient-quantity" placeholder="Quantity" required>
+                <select class="ingredient-unit">
+                        <option value="Units">Units</option>
+                        <option value="Cups">Cups</option>
+                        <option value="Pounds">Pounds</option>
+                        <option value="Ounces">Ounces</option>
+                </select>
+                `;
 
-        </script>
+                ingredientsList.appendChild(ingredientDiv);
+        }
 
+        function saveNewRecipe() {
+            const recipeName = document.querySelector('.add-recipe-entry input[type="text"]').value; // Recipe Name input
+            const ingredientsList = document.querySelectorAll('#ingredients-list .ingredient'); // All ingredients added
 
+            const newIngredients = Array.from(ingredientsList).map(ingredientDiv => ({
+                ingredient: ingredientDiv.querySelector('input[type="text"]').value,
+                quantity: parseFloat(ingredientDiv.querySelector('input[type="number"]').value),
+                unit: ingredientDiv.querySelector('select').value
+        }));
 
-    </body >
-    </html >
+        if (!recipes[recipeName]) {
+        recipes[recipeName] = { name: recipeName, ingredients: newIngredients };
+        alert('Recipe added successfully!');
+        populateDropdown(); // Update dropdown for view/recipe update section
+        populateRecipeCostDropdown(); // Update dropdown for cost section
+        }   else {
+        alert('A recipe with this name already exists.');
+    }
+}
+
+        //say recipe is saved
+        function saveRecipe() {
+            const recipeName = document.getElementById('recipeName').value;
+            const ingredientsList = document.getElementById('ingredient-list').children;
+
+            const updatedIngredients = Array.from(ingredientsList).map(ingredientDiv => ({
+                ingredient: ingredientDiv.querySelector('.ingredient-name').value,
+                quantity: parseFloat(ingredientDiv.querySelector('.ingredient-quantity').value),
+                unit: ingredientDiv.querySelector('.ingredient-unit').value
+            }));
+
+            //update the recipe (change later to connect to database)
+            recipes[recipeName] = { name: recipeName, ingredients: updatedIngredients };
+
+            alert('Recipe updated successfully!');
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////
+
+        //shows dropdown for the recipes to select from to show cost
+        function populateRecipeCostDropdown() {
+            const dropdown = document.getElementById('chooseRecipeCost');
+            dropdown.innerHTML = '<option value="">Select a recipe</option>'; //to reset
+
+            for (const recipeName in recipes) {
+                const option = document.createElement('option');
+                option.value = recipeName;
+                option.textContent = recipeName;
+                dropdown.appendChild(option);
+            }
+        }
+        populateRecipeCostDropdown();
+
+        //show recipe cost details
+        function viewRecipeCost() {
+            const chosenRecipeName = document.getElementById('chooseRecipeCost').value;
+            const recipeDetailsDiv = document.getElementById('recipeCostDetails');
+            const ingredientCostList = document.getElementById('ingredientCostList');
+            const totalCostElement = document.getElementById('totalCost');
+
+            if (chosenRecipeName && recipes[chosenRecipeName]) {
+                const recipe = recipes[chosenRecipeName];
+                document.getElementById('chosenRecipeName').textContent = recipe.name;
+                ingredientCostList.innerHTML = '';
+
+                let totalCost = 0;  //to start with then add the costs
+
+                //show the list of recipe details with cost
+                recipe.ingredients.forEach((ingredient) => {
+                    const row = document.createElement('tr');
+
+                    row.innerHTML = `
+                                    <td>${ingredient.ingredient}</td>
+                                    <td>${ingredient.quantity}</td>
+                                    <td>${ingredient.unit}</td>
+                                    <td>$${(ingredient.price * ingredient.quantity).toFixed(2)}</td>
+                                    <td>${ingredient.available ? "In Stock" : "Out of Stock"}</td>
+                                `;
+
+                    ingredientCostList.appendChild(row);
+                    totalCost += ingredient.price * ingredient.quantity;
+                });
+
+                totalCostElement.textContent = `$${totalCost.toFixed(2)}`;
+                recipeDetailsDiv.style.display = 'block';
+            } else {
+                recipeDetailsDiv.style.display = 'none';
+                alert('Select a recipe.');
+            }
+        }
+
+    </script>
+
+</body>
+</html>

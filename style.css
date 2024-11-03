@@ -17,7 +17,6 @@ body {
 
 .wrapper {
   width: 420px;
-  background: transparent;
   color: #fff;
   border-radius: 10px;
   margin-top: -150px;
@@ -26,7 +25,7 @@ body {
   align-items: center;
 }
 
-.wrapper h1 {
+h1 {
    font-size: 36px;
    text-align: center; 
    background-color: #DA8359;
@@ -37,6 +36,8 @@ body {
     width: 100%;
     height: 50px;
     margin: 30px 0;
+    border-radius: 40px;
+    border: 2px solid #DA8359; 
 }
 
 .input-box input {
@@ -45,7 +46,6 @@ body {
     background: transparent;
     border: none;
     outline: none;
-    border: 2px solid rgb(0,0,0,0.1);
     border-radius: 40px;
     font-size: 14px;
     color: #fff;
@@ -88,3 +88,194 @@ body {
 .register a:hover {
     text-decoration: underline;
 }
+
+ul{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    background-color: #DA8359;
+    display: flex;
+    position: fixed;
+    align-items: center;
+    justify-content: space-around;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+}
+
+li{
+    display: inline;
+    padding: 10px 30px;
+}
+
+li a {
+    display: block;
+    color: white;
+    font-size: 20px;
+    text-align: center;
+    padding: 10px 10px;
+    text-decoration: none;
+}
+
+.section {
+    display: none;
+    padding: 20px;
+}
+
+.section h2 {
+    font-size: 48px;
+    color: #333;
+    margin-bottom: 10px;
+    position: fixed;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.section p {
+    font-size: 24px;
+    color: #333;
+    font-weight: bold;
+    line-height: 1.5;
+    margin: 10px 0;
+}
+
+.add-recipe-entry {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.input-box, .ingredient {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    border-radius: 40px;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+button {
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 40px;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+button[type="button"] {
+    background-color: #DA8359;
+    color: #fff;
+    margin-top: 10px;
+    border-radius: 40px;
+}
+
+.save-button {
+    background-color: #DA8359;
+    color: #fff;
+    border-radius: 40px;
+}
+
+#chooseRecipeUpdate, #chooseRecipeCost {
+    width: 100%;
+    padding: 15px;
+    font-size: 20px;
+    border: 1px solid #ddd;
+    border-radius: 40px; 
+    margin-bottom: 20px;
+    cursor: pointer;
+    text-align: center;
+}
+
+#chooseRecipeUpdate, #chooseRecipeCost  .input-box {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 15px;
+}
+
+.input-box input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 40px;
+    font-size: 16px;
+}
+
+button {
+    border: none;
+    font-size: 16px;
+    border: none;
+    border-radius: 40px; 
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+button[type="button"] {
+    background-color: #DA8359;
+    color: #fff;
+}
+
+#recipeName {
+    margin-bottom: 20px;  
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+table th,
+table td {
+    padding: 12px 15px;
+    text-align: center;
+    font-size: 16px;
+}
+
+table thead {
+    background-color: #DA8359;
+    color: #fff;
+}
+
+table th {
+    font-weight: 600;
+}
+
+table td {
+    color: #333;
+}
+
+#recipeCostDetails h3 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+#recipeCostDetails h4 {
+    margin-top: 20px;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: right;
+    color: #333;
+}
+
+
+
+
+
