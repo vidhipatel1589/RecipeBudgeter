@@ -80,14 +80,41 @@
     <div class="section" id="home" style="display: none;">
         <h2>Welcome to Recipe Budgeter</h2>
         <h1>Here are your recipes!</h1>
-        <p>Omelet</p>
-        <p>Chicken and Rice</p>
+        <h3 style="text-align: center;">Click on a recipe to view details</h3>
+
+        <!--recipe list-->
+        <div id="recipeList">
+            <!-- Populated with JS -->
+        </div>
+
+
+        <!--recipe cost details for home page -->
+        <div id="recipeCostDetailsHome" style="display: none;">
+            <h3 id="chosenRecipeNameHome"></h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ingredient</th>
+                        <th>Quantity</th>
+                        <th>Unit</th>
+                        <th>Price</th>
+                        <th>Availability</th>
+                    </tr>
+                </thead>
+                <tbody id="ingredientCostListHome">
+
+                </tbody>
+            </table>
+            <h4>Total Cost: <span id="totalCostHome"></span></h4>
+        </div>
+
     </div>
 
     <!------------------------------------------------------------------------------------------->
     <!-- for recipe page -->
     <div class="section" id="add-recipe" style="display: none;">
         <h2>Add Your Recipe</h2>
+        <h3 style="text-align: center;">Add your own recipe by adding a recipe name and adding a list of ingredients</h3>
         <form action="" class="add-recipe-entry">
             <div class="input-box">
                 <input type="text" placeholder="Recipe Name" required>
@@ -114,6 +141,7 @@
     <!-- for recipes section -->
     <div class="section" id="view-recipes" style="display: none;">
         <h2>List of Recipes</h2>
+        <h3 style="text-align: center;">Click on a recipe to view the cost breakdown and total</h3>
         <!-- select recipe -->
         <select id="chooseRecipeUpdate" onchange="loadRecipeData()">
             <option value="">Select a recipe</option>
@@ -256,6 +284,57 @@
         });
 
         ////////////////////////////////////////////////////////////////////////////////////////
+
+        //list of clickable recipes on the home page
+        function populateRecipeList() {
+            const recipeList = document.getElementById('recipeList');
+            recipeList.innerHTML = '';
+
+            for (const recipeName in recipes) {
+                const recipeItem = document.createElement('div');
+                recipeItem.className = 'recipe-item';
+                recipeItem.textContent = recipeName;
+                recipeItem.onclick = () => showRecipeDetailsOnHome(recipeName);
+                recipeList.appendChild(recipeItem);
+            }
+        }
+        populateRecipeList();
+
+        function showRecipeDetailsOnHome(chosenRecipeName) {
+            const recipeDetailsDiv = document.getElementById('recipeCostDetailsHome');
+            const ingredientCostList = document.getElementById('ingredientCostListHome');
+            const totalCostElement = document.getElementById('totalCostHome');
+
+            if (chosenRecipeName && recipes[chosenRecipeName]) {
+                const recipe = recipes[chosenRecipeName];
+                document.getElementById('chosenRecipeNameHome').textContent = recipe.name;
+                ingredientCostList.innerHTML = '';
+
+                let totalCost = 0;
+
+
+                recipe.ingredients.forEach((ingredient) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                <td>${ingredient.ingredient}</td>
+                <td>${ingredient.quantity}</td>
+                <td>${ingredient.unit}</td>
+                <td>$${(ingredient.price * ingredient.quantity).toFixed(2)}</td>
+                <td>${ingredient.available ? "In Stock" : "Out of Stock"}</td>
+            `;
+                    ingredientCostList.appendChild(row);
+                    totalCost += ingredient.price * ingredient.quantity;
+                });
+
+
+                totalCostElement.textContent = `$${totalCost.toFixed(2)}`;
+                recipeDetailsDiv.style.display = 'block';
+            } else {
+                recipeDetailsDiv.style.display = 'none';
+            }
+        }
+
+        ///////////////////////////////////////////////////////////////////////////////////////
 
         //when user types, it'll find the ingredient in the list
         function filterIngredients() {
