@@ -90,7 +90,7 @@
 
         <!--recipe cost details for home page -->
         <div id="recipeCostDetailsHome" style="display: none;">
-            <h3 id="chosenRecipeNameHome"></h3>
+            <h4 id="chosenRecipeNameHome"></h4>
             <table>
                 <thead>
                     <tr>
@@ -105,7 +105,7 @@
 
                 </tbody>
             </table>
-            <h4>Total Cost: <span id="totalCostHome"></span></h4>
+            <h5>Total Cost: <span id="totalCostHome"></span></h5>
         </div>
 
     </div>
@@ -114,11 +114,14 @@
     <!-- for recipe page -->
     <div class="section" id="add-recipe" style="display: none;">
         <h2>Add Your Recipe</h2>
-        <h3 style="text-align: center;">Add your own recipe by adding a recipe name and adding a list of ingredients</h3>
+        <h3 style="text-align: center;">Add your own recipe</h3>
         <form action="" class="add-recipe-entry">
             <div class="input-box">
                 <input type="text" placeholder="Recipe Name" required>
             </div>
+            <div class="description-box">
+                <textarea placeholder="Recipe Description" required></textarea>
+            </div>    
             <div class="ingredients-list" id="ingredients-list">
                 <div class="ingredient">
                     <input type="text" id="ingredientInput" placeholder="Ingredient" required oninput="filterIngredients()">
@@ -141,7 +144,7 @@
     <!-- for recipes section -->
     <div class="section" id="view-recipes" style="display: none;">
         <h2>List of Recipes</h2>
-        <h3 style="text-align: center;">Click on a recipe to view the cost breakdown and total</h3>
+        <h3 style="text-align: center;">Select a recipe</h3>
         <!-- select recipe -->
         <select id="chooseRecipeUpdate" onchange="loadRecipeData()">
             <option value="">Select a recipe</option>
@@ -152,6 +155,10 @@
             <h1>
                 <input type="text" id="recipeName" required>
             </h1>
+            
+            <div class="description-box">
+                <textarea placeholder="Recipe Description" required></textarea>
+            </div>  
 
             <div class="ingredients-list" id="ingredient-list">
                 <div class="ingredient">
