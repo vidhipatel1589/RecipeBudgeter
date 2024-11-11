@@ -98,18 +98,83 @@ app.get('/api/getAllRecipes', (req, res) => {
     })
 })
 
-// Get Specific Recipe
-app.get('/api/getRecipe', (req, res) => {
-    const query = `SELECT * FROM recipe WHERE recipeID = ?`
-    connection.query(query, [recipeID], (err, results) => {
+// Fetch User Recipes
+app.post('/api/userRecipe', (req, res) => {
+    const userID = req.body.userID;
+    
+    const query = `
+        SELECT 
+            r.recipeID, 
+            r.recipeName, 
+            r.description
+        FROM recipe r
+        WHERE r.userID IS NULL OR r.userID = ?
+    `;
+    
+    connection.query(query, [userID], (err, recipes) => {
         if (err) {
-        console.error(err)
-        res.status(500).json({ message: 'Failed to get recipe' })
-        } else {
-        res.status(200).json(results)
+            console.error(err);
+            return res.status(500).json({ message: 'Failed to fetch recipes' });
         }
-    })
-})
+
+        // If no recipes found, return an empty array
+        if (recipes.length === 0) {
+            return res.status(200).json([]);
+        }
+
+        // Fetch ingredients for each recipe
+        const recipeIDs = recipes.map(recipe => recipe.recipeID);
+        const ingredientQuery = `
+            SELECT 
+                ri.recipeID,
+                ri.itemID AS ingredientID,
+                i.itemName AS ingredientName,
+                ri.quantity,
+                ri.unitID,
+                u.unitName,
+                i.price,
+                i.size,
+                i.stock
+            FROM recipe_item ri
+            JOIN inventory i ON ri.itemID = i.itemID
+            JOIN unit u ON ri.unitID = u.id
+            WHERE ri.recipeID IN (?)
+        `;
+
+        connection.query(ingredientQuery, [recipeIDs], (err, ingredients) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ message: 'Failed to fetch ingredients' });
+            }
+
+            // Map ingredients to their corresponding recipes and calculate totalPrice
+            const recipeMap = recipes.map(recipe => {
+                const recipeIngredients = ingredients.filter(ing => ing.recipeID === recipe.recipeID);
+                const totalPrice = 0.00;
+
+                return {
+                    recipeID: recipe.recipeID,
+                    recipeName: recipe.recipeName,
+                    description: recipe.description,
+                    totalPrice: totalPrice.toFixed(2),
+                    ingredients: recipeIngredients.map(ing => ({
+                        ingredientID: ing.ingredientID,
+                        ingredientName: ing.ingredientName,
+                        quantity: ing.quantity,
+                        unitID: ing.unitID,
+                        unitName: ing.unitName,
+                        price: ing.price,
+                        size: ing.size,
+                        stock: ing.stock
+                    }))
+                };
+            });
+
+            res.status(200).json(recipeMap);
+        });
+    });
+});
+
 
 // Add New Recipe
 app.post('/api/addRecipe', (req, res) => {
