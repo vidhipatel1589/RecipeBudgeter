@@ -210,29 +210,8 @@
     </div>
 
     <!------------------------------------------------------------------------------------------->
-
+    <script src="js/login.js"></script>
     <script>
-        //test to check if username and password work
-        function validateLogin(username, password) {
-            return username === "username" && password === "password";
-        }
-
-        //handles the login function
-        document.getElementById('loginForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            if (validateLogin(username, password)) {
-                //navigation bar becomes visible after logging in
-                document.getElementById('navbar').style.display = 'block';
-                showSection('home');    //open at home page
-                //login form goes away after logging in
-                document.querySelector('.wrapper').style.display = 'none';
-            } else {
-                alert('Invalid username or password. Please try again.');
-            }
-        });
 
         function showLogin() {
             document.getElementById('signupWrapper').style.display = 'none';
