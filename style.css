@@ -203,11 +203,30 @@ li a {
 }
 
 button {
-    padding: 10px;
-    font-size: 16px;
+    padding: 4px;
+    font-size: 12px;
     border: none;
-    border-radius: 40px;
+    border-radius: 50%;
     cursor: pointer;
+}
+button .X-button {
+    background-color: #DA8359;
+    color: #fff;
+    font-size: 12px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-left: 5px;
+    padding: 0px;
+    border: none; 
+}
+
+button .X-button:hover {
+    opacity: 0.8;
 }
 
 button:hover {

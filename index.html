@@ -7,7 +7,6 @@
           rel='stylesheet'>
 </head>
 <body>
-
     <div class="wrapper">
         <h1 class="Title">Recipe Budgeter</h1>
         <form id="loginForm">
@@ -72,6 +71,7 @@
             <li><a href="#add-recipe">Add A New Recipe</a></li>
             <li><a href="#view-recipes">Update A Recipe</a></li>
             <li><a href="#view-recipe-cost">View Recipe Cost</a></li>
+            <li><a href="#" onclick="showLogin()">Logout</a></li>
         </ul>
     </nav>
 
@@ -91,6 +91,9 @@
         <!--recipe cost details for home page -->
         <div id="recipeCostDetailsHome" style="display: none;">
             <h4 id="chosenRecipeNameHome"></h4>
+            <div class="description-box">
+                <textarea placeholder="Recipe Description" required></textarea>
+            </div> 
             <table>
                 <thead>
                     <tr>
@@ -132,6 +135,7 @@
                         <option value="Pounds">Pounds</option>
                         <option value="Ounces">Ounces</option>
                     </select>
+                    <button type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
                 </div>
             </div>
 
@@ -170,6 +174,7 @@
                         <option value="Pounds">Pounds</option>
                         <option value="Ounces">Ounces</option>
                     </select>
+                    <button  type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
                 </div>
             </div>
 
@@ -191,6 +196,9 @@
         <!-- see details -->
         <div id="recipeCostDetails" style="display: none;">
             <h3 id="chosenRecipeName"></h3>
+            <div class="description-box">
+                <textarea placeholder="Recipe Description" required></textarea>
+            </div> 
             <table>
                 <thead>
                     <tr>
@@ -217,6 +225,9 @@
         function showLogin() {
             document.getElementById('signupWrapper').style.display = 'none';
             document.querySelector('.wrapper').style.display = 'block';
+            document.getElementById('navbar').style.display = 'none';
+               document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
         }
 
         function showSignup() {
@@ -397,10 +408,17 @@
                 <option value="Pounds">Pounds</option>
                 <option value="Ounces">Ounces</option>
             </select>
+            <button type="button" class="X-button"  onclick="deleteIngredient(this)">X</button>
         `;
 
             ingredientsList.appendChild(ingredientDiv);
         }
+
+        function deleteIngredient(button) {
+            const ingredientDiv = button.parentElement; // Get the parent div of the delete button
+            ingredientDiv.remove(); // Remove the ingredient row from the DOM
+        }
+
 
         ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -441,6 +459,7 @@
                                         <input type="text" value="${ingredient.ingredient}" class="ingredient-name">
                                         <input type="number" value="${ingredient.quantity}" class="ingredient-quantity">
                                         <input type="text" value="${ingredient.unit}" class="ingredient-unit">
+                                        <button type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
                                     `;
                     ingredientsList.appendChild(ingredientDiv);
                 });
@@ -468,6 +487,7 @@
                         <option value="Pounds">Pounds</option>
                         <option value="Ounces">Ounces</option>
                 </select>
+                <button type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
                 `;
 
                 ingredientsList.appendChild(ingredientDiv);
