@@ -1,10 +1,28 @@
-// console.log(localStorage.getItem('recipes'));
+function convertRecipes() {
+    const recipesStorage = JSON.parse(localStorage.getItem('recipes'));
+    if (!recipesStorage) {
+        console.error("No recipes found in localStorage");
+        return;
+    }
 
-// const recipes = {
-//     "Omelet": { name: "Omelet", ingredients: [{ ingredient: "Eggs", quantity: 2, unit: "Units", price: 0.50, available: true }, { ingredient: "spinach", quantity: 10, unit: "Ounces", price: 0.20, available: true }] },
-//     "Chicken and Rice": { name: "Chicken and Rice", ingredients: [{ ingredient: "chicken", quantity: 1, unit: "Pounds",available: false }, { ingredient: "rice", quantity: 1, unit: "Cups", price: 1.20, available: true }] }, 
-// };
+    const formattedRecipes = recipesStorage.reduce((acc, recipe) => {
+        const { recipeName, ingredients } = recipe;
+        acc[recipeName] = {
+            name: recipeName,
+            ingredients: ingredients.map(ingredient => ({
+                ingredient: ingredient.ingredientName,
+                quantity: ingredient.quantity,
+                unit: ingredient.unitName,
+                price: ingredient.price || 0,
+                available: parseInt(ingredient.stock, 10) > 0
+            })),
+            description: recipe.description
+        };
+        return acc;
+    }, {});
 
+    return formattedRecipes;
+}
 
 
 

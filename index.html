@@ -92,7 +92,7 @@
         <div id="recipeCostDetailsHome" style="display: none;">
             <h4 id="chosenRecipeNameHome"></h4>
             <div class="description-box">
-                <textarea placeholder="Recipe Description" required></textarea>
+                <textarea readonly id="recipeDescriptionBox" placeholder="Recipe Description" required></textarea>
             </div> 
             <table>
                 <thead>
@@ -197,7 +197,7 @@
         <div id="recipeCostDetails" style="display: none;">
             <h3 id="chosenRecipeName"></h3>
             <div class="description-box">
-                <textarea placeholder="Recipe Description" required></textarea>
+                <textarea readonly id="recipeDescriptionCostBox" placeholder="Recipe Description" required></textarea>
             </div> 
             <table>
                 <thead>
@@ -219,7 +219,7 @@
 
     <!------------------------------------------------------------------------------------------->
     <script src="js/login.js"></script>
-    <!-- <script src="js/home.js"></script> -->
+    <script src="js/home.js"></script>
     <script>
 
         function showLogin() {
@@ -252,18 +252,18 @@
         ////////////////////////////////////////////////////////////////////////////////////////
 
         // temporary list of ingredients, get from database instead later
-        const ingredients = [
-            "Salt",
-            "Pepper",
-            "Eggs",
-            "Butter",
-            "Rice",
-            "Spinach",
-            "Onion",
-            "Tomato",
-            "Olive oil",
-            "Chicken"
-        ];
+        // const ingredients = [
+        //     "Salt",
+        //     "Pepper",
+        //     "Eggs",
+        //     "Butter",
+        //     "Rice",
+        //     "Spinach",
+        //     "Onion",
+        //     "Tomato",
+        //     "Olive oil",
+        //     "Chicken"
+        // ];
 
         // temporary list of recipes, get from database later
         // const recipes = {
@@ -272,31 +272,6 @@
         // };
 
         const recipes = convertRecipes();
-
-        function convertRecipes() {
-            const recipesStorage = JSON.parse(localStorage.getItem('recipes'));
-            if (!recipesStorage) {
-                console.error("No recipes found in localStorage");
-                return;
-            }
-
-            const formattedRecipes = recipesStorage.reduce((acc, recipe) => {
-                const { recipeName, ingredients } = recipe;
-                acc[recipeName] = {
-                    name: recipeName,
-                    ingredients: ingredients.map(ingredient => ({
-                        ingredient: ingredient.ingredientName,
-                        quantity: ingredient.quantity,
-                        unit: ingredient.unitName,
-                        price: ingredient.price || 0,
-                        available: ingredient.stock > 0
-                    }))
-                };
-                return acc;
-            }, {});
-
-            return formattedRecipes;
-        }
 
         ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -313,6 +288,7 @@
         //list of clickable recipes on the home page
         function populateRecipeList() {
             const recipeList = document.getElementById('recipeList');
+
             recipeList.innerHTML = '';
 
             for (const recipeName in recipes) {
@@ -321,6 +297,7 @@
                 recipeItem.textContent = recipeName;
                 recipeItem.onclick = () => showRecipeDetailsOnHome(recipeName);
                 recipeList.appendChild(recipeItem);
+                
             }
         }
         populateRecipeList();
@@ -333,7 +310,10 @@
             if (chosenRecipeName && recipes[chosenRecipeName]) {
                 const recipe = recipes[chosenRecipeName];
                 document.getElementById('chosenRecipeNameHome').textContent = recipe.name;
+                const recipeDescription = document.getElementById('recipeDescriptionBox');
+
                 ingredientCostList.innerHTML = '';
+                recipeDescription.value = recipe.description;
 
                 let totalCost = 0;
 
@@ -554,9 +534,12 @@
             if (chosenRecipeName && recipes[chosenRecipeName]) {
                 const recipe = recipes[chosenRecipeName];
                 document.getElementById('chosenRecipeName').textContent = recipe.name;
-                ingredientCostList.innerHTML = '';
 
+                const recipeDescription = document.getElementById('recipeDescriptionCostBox');
+                recipeDescription.value = recipe.description;
+                ingredientCostList.innerHTML = '';
                 let totalCost = 0;  //to start with then add the costs
+                
 
                 //show the list of recipe details with cost
                 recipe.ingredients.forEach((ingredient) => {
