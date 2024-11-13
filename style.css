@@ -169,10 +169,12 @@ li a {
     font-size: 48px;
     color: #333;
     margin-bottom: 10px;
-    position: fixed;
+    /* position: fixed; */
     top: 10%;
     left: 50%;
-    transform: translateX(-50%);
+    /* transform: translateX(-50%); */
+    margin-top: 50px;
+    text-align: center;
 }
 
 .section p {
