@@ -159,10 +159,10 @@
             <h1>
                 <input type="text" id="recipeName" required>
             </h1>
-            
+
             <div class="description-box">
                 <textarea placeholder="Recipe Description" required></textarea>
-            </div>  
+            </div>
 
             <div class="ingredients-list" id="ingredient-list">
                 <div class="ingredient">
@@ -174,12 +174,13 @@
                         <option value="Pounds">Pounds</option>
                         <option value="Ounces">Ounces</option>
                     </select>
-                    <button  type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
+                    <button type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
                 </div>
             </div>
 
             <button type="button" onclick="addAnotherIngredient()">Add Another Ingredient</button>
             <button type="button" onclick="saveRecipe()">Save Recipe</button>
+            <button type="button" onclick="deleteRecipe()">Delete Recipe</button>
         </form>
     </div>
 
@@ -506,6 +507,22 @@
             recipes[recipeName] = { name: recipeName, ingredients: updatedIngredients };
 
             alert('Recipe updated successfully!');
+        }
+
+        function deleteRecipe() {
+            const recipeName = document.getElementById('recipeName').value;
+            const ingredientsList = document.getElementById('ingredient-list').children;
+
+            //update the recipe (change later to connect to database)
+            //recipes[recipeName] = { name: recipeName, ingredients: updatedIngredients };
+
+            if (recipes.hasOwnProperty(recipeName)) {
+                delete recipes[recipeName];
+                alert('Recipe deleted successfully');
+            }
+            else {
+                alert('error cannot delete');
+            }
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////
