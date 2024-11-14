@@ -128,7 +128,7 @@
             <div class="ingredients-list" id="ingredients-list">
                 <div class="ingredient">
                     <input type="text" id="ingredientInput" placeholder="Ingredient" required oninput="filterIngredients()">
-                    <input type="number" placeholder="Quantity" required>
+                    <input type="number" placeholder="Quantity" required min = "0" id="initialQuantity">
                     <select>
                         <option value="Units">Units</option>
                         <option value="Cups">Cups</option>
@@ -144,6 +144,17 @@
         </form>
     </div>
 
+    <script>
+        // Prevent negative input for initial quantity field on page load
+        document.addEventListener("DOMContentLoaded", () => {
+            const initialQuantityInput = document.getElementById('initialQuantity');
+            initialQuantityInput.addEventListener('input', () => {
+                if (initialQuantityInput.value < 0) {
+                    initialQuantityInput.value = 0;
+                }
+            });
+        });
+    </script>
     <!------------------------------------------------------------------------------------------->
     <!-- for recipes section -->
     <div class="section" id="view-recipes" style="display: none;">
@@ -167,7 +178,7 @@
             <div class="ingredients-list" id="ingredient-list">
                 <div class="ingredient">
                     <input type="text" id="ingredientInput" placeholder="Ingredient" required oninput="filterIngredients()">
-                    <input type="number" placeholder="Quantity" required>
+                    <input type="number" placeholder="Quantity" required min = "0">
                     <select>
                         <option value="Units">Units</option>
                         <option value="Cups">Cups</option>
@@ -382,7 +393,7 @@
             //fields for new ingredient
             ingredientDiv.innerHTML = `
             <input type="text" placeholder="Ingredient" required oninput="filterIngredients()">
-            <input type="number" placeholder="Quantity" required>
+            <input type="number" placeholder="Quantity" required min = "0">
             <select>
                 <option value="Units">Units</option>
                 <option value="Cups">Cups</option>
@@ -393,6 +404,14 @@
         `;
 
             ingredientsList.appendChild(ingredientDiv);
+            
+            // Prevent negative values in the new quantity field
+            const quantityInput = ingredientDiv.querySelector('input[type="number"]');
+            quantityInput.addEventListener('input', () => {
+                if (quantityInput.value < 0) {
+                    quantityInput.value = 0; // Reset to 0 if negative number is entered
+                }
+            });
         }
 
         function deleteIngredient(button) {
@@ -438,13 +457,22 @@
                     ingredientDiv.className = 'ingredient-entry';
                     ingredientDiv.innerHTML = `
                                         <input type="text" value="${ingredient.ingredient}" class="ingredient-name">
-                                        <input type="number" value="${ingredient.quantity}" class="ingredient-quantity">
+                                        <input type="number" value="${ingredient.quantity}" class="ingredient-quantity" min = "0">
                                         <input type="text" value="${ingredient.unit}" class="ingredient-unit">
                                         <button type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
                                     `;
                     ingredientsList.appendChild(ingredientDiv);
                 });
-
+                
+                //Prevent users from manually entering a negative number
+                document.querySelectorAll('.ingredient-quantity').forEach(input => {
+                input.addEventListener('input', () => {
+                    if (input.value < 0) {
+                        input.value = 0; // Reset to 0 if negative number is entered
+                    }
+                    });
+                });
+            
                 //show form to update recipe
                 document.getElementById('updateRecipeForm').style.display = 'block';
             } else {
@@ -461,7 +489,7 @@
             ingredientDiv.className = 'ingredient-entry';
             ingredientDiv.innerHTML = `
                 <input type="text" class="ingredient-name" placeholder="Ingredient" required>
-                <input type="number" class="ingredient-quantity" placeholder="Quantity" required>
+                <input type="number" class="ingredient-quantity" placeholder="Quantity" required min = "0">
                 <select class="ingredient-unit">
                         <option value="Units">Units</option>
                         <option value="Cups">Cups</option>
@@ -472,6 +500,14 @@
                 `;
 
                 ingredientsList.appendChild(ingredientDiv);
+
+                const quantityInput = ingredientDiv.querySelector('.ingredient-quantity');
+                quantityInput.addEventListener('input', () => {
+                    if (quantityInput.value < 0) {
+                        quantityInput.value = 0; // Reset to 0 if negative number is entered
+                    }
+    });
+        
         }
 
         function saveNewRecipe() {
