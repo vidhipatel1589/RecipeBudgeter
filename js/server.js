@@ -98,7 +98,7 @@ app.get('/api/getAllRecipes', (req, res) => {
     })
 })
 
-// Fetch User Recipes
+// Fetch Recipes
 app.post('/api/userRecipe', (req, res) => {
     const userID = req.body.userID;
     
@@ -108,10 +108,9 @@ app.post('/api/userRecipe', (req, res) => {
             r.recipeName, 
             r.description
         FROM recipe r
-        WHERE r.userID IS NULL OR r.userID = ?
     `;
     
-    connection.query(query, [userID], (err, recipes) => {
+    connection.query(query, (err, recipes) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ message: 'Failed to fetch recipes' });
@@ -134,12 +133,21 @@ app.post('/api/userRecipe', (req, res) => {
                 u.unitName,
                 i.price,
                 i.size,
-                i.stock
+                i.stock,
+                CASE 
+                    WHEN u.unitType = 'ea' THEN 1
+                    WHEN u.unitType = 'mass' THEN mu.kgConversion
+                    WHEN u.unitType = 'volume' THEN vu.literConversion
+                    ELSE 1
+                END AS unitConversion
             FROM recipe_item ri
             JOIN inventory i ON ri.itemID = i.itemID
             JOIN unit u ON ri.unitID = u.id
+            LEFT JOIN mass_unit mu ON u.id = mu.unitID AND u.unitType = 'mass'
+            LEFT JOIN volume_unit vu ON u.id = vu.unitID AND u.unitType = 'volume'
             WHERE ri.recipeID IN (?)
         `;
+
 
         connection.query(ingredientQuery, [recipeIDs], (err, ingredients) => {
             if (err) {
@@ -165,7 +173,8 @@ app.post('/api/userRecipe', (req, res) => {
                         unitName: ing.unitName,
                         price: ing.price,
                         size: ing.size,
-                        stock: ing.stock
+                        stock: ing.stock,
+                        unitConversion: ing.unitConversion
                     }))
                 };
             });
@@ -178,14 +187,31 @@ app.post('/api/userRecipe', (req, res) => {
 
 // Add New Recipe
 app.post('/api/addRecipe', (req, res) => {
-    const { name, ingredients, instructions } = req.body
-    const query = `INSERT INTO recipe (name, ingredients, instructions) VALUES (?, ?, ?)`
-    connection.query(query, [recipeName, description, userID], (err, results) => {
+    const { name, description, userID } = req.body
+    const query = `INSERT INTO recipe (recipeName, description, userID) VALUES (?, ?, ?)`
+    connection.query(query, [name, description, userID], (err, results) => {
         if (err) {
         console.error(err)
         res.status(500).json({ message: 'Failed to add recipe' })
         } else {
-        res.status(201).json({ message: 'Recipe added successfully' })
+            res.status(201).json({ 
+                message: 'Recipe added successfully', 
+                recipeID: results.insertId 
+            });
+        }
+    })
+})
+
+// Update Recipe
+app.post('/api/updateRecipe', (req, res) => {
+    const { recipeID } = req.body
+    const query = `UPDATE recipe SET recipeName = ?, description = ? WHERE recipeID = ?`
+    connection.query(query, [recipeName, description, recipeID], (err, results) => {
+        if (err) {
+        console.error(err)
+        res.status(500).json({ message: 'Failed to update recipe' })
+        } else {
+        res.status(200).json({ message: 'Recipe updated successfully' })
         }
     })
 })
@@ -206,9 +232,9 @@ app.post('/api/deleteRecipe', (req, res) => {
 
 // Add Item to Recipe
 app.post('/api/addRecipeItem', (req, res) => {
-    const { recipeID, quantity, unitID } = req.body
-    const query = `INSERT INTO recipe_item (recipe_id, quantity, unit) VALUES (?, ?, ?)`
-    connection.query(query, [recipeID, quantity, unitID], (err, results) => {
+    const { recipeID, itemID, quantity, unitID } = req.body
+    const query = `INSERT INTO recipe_item (recipeID, itemID, quantity, unitID) VALUES (?, ?, ?)`
+    connection.query(query, [recipeID, itemID, quantity, unitID], (err, results) => {
         if (err) {
         console.error(err)
         res.status(500).json({ message: 'Failed to add recipe item' })

@@ -179,7 +179,7 @@
             </div>
 
             <button type="button" onclick="addAnotherIngredient()">Add Another Ingredient</button>
-            <button type="button" onclick="saveRecipe()">Save Recipe</button>
+            <button type="button" onclick="updateRecipe()">Save Recipe</button>
         </form>
     </div>
 
@@ -220,6 +220,7 @@
     <!------------------------------------------------------------------------------------------->
     <script src="js/login.js"></script>
     <script src="js/home.js"></script>
+    <script src="js/updateRecipe.js"></script>
     <script>
 
         function showLogin() {
@@ -425,7 +426,10 @@
             const chosenRecipeName = document.getElementById('chooseRecipeUpdate').value;
             if (chosenRecipeName) {
                 const recipe = recipes[chosenRecipeName];
+                localStorage.setItem('recipeID', recipe.recipeID);
                 document.getElementById('recipeName').value = recipe.name;
+
+                document.querySelector('#updateRecipeForm textarea').value = recipe.description;
 
                 //clear out previous
                 const ingredientsList = document.getElementById('ingredient-list');
@@ -475,23 +479,63 @@
 
         function saveNewRecipe() {
             const recipeName = document.querySelector('.add-recipe-entry input[type="text"]').value; // Recipe Name input
+            const recipeDescription = document.querySelector('.add-recipe-entry textarea').value; // Recipe Description input
             const ingredientsList = document.querySelectorAll('#ingredients-list .ingredient'); // All ingredients added
 
             const newIngredients = Array.from(ingredientsList).map(ingredientDiv => ({
                 ingredient: ingredientDiv.querySelector('input[type="text"]').value,
                 quantity: parseFloat(ingredientDiv.querySelector('input[type="number"]').value),
                 unit: ingredientDiv.querySelector('select').value
-        }));
+            }));
 
-        if (!recipes[recipeName]) {
-        recipes[recipeName] = { name: recipeName, ingredients: newIngredients };
-        alert('Recipe added successfully!');
-        populateDropdown(); 
-        populateRecipeCostDropdown(); 
-        }   else {
-        alert('A recipe with this name already exists.');
-    }
-}
+            fetch('http://localhost:1337/api/addRecipe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: recipeName,
+                    description: recipeDescription,
+                    userID: localStorage.getItem('userID'),
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.recipeID) {
+                    console.log('Recipe added successfully with ID:', data.recipeID);
+                    // Now use the recipeID in the subsequent fetch requests
+                    const recipeID = data.recipeID;
+
+                    for (const ingredient of newIngredients) {
+                        fetch('http://localhost:1337/api/addRecipeItem', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                recipeID: recipeID, // Use the recipeID here
+                                ingredient: ingredient.ingredient, // Include the ingredient name
+                                quantity: ingredient.quantity,
+                                unit: ingredient.unit
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log(data);
+                        })
+                        .catch(error => {
+                            console.error('Error adding ingredient:', error);
+                        });
+                    }
+                } else {
+                    console.log('Response:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
         function saveRecipe() {
             const recipeName = document.getElementById('recipeName').value;
             const ingredientsList = document.getElementById('ingredient-list').children;
