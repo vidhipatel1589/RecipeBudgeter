@@ -180,6 +180,7 @@
 
             <button type="button" onclick="addAnotherIngredient()">Add Another Ingredient</button>
             <button type="button" onclick="updateRecipe()">Save Recipe</button>
+            <button type="button" onclick="deleteRecipe()">Delete Recipe</button>
         </form>
     </div>
 
@@ -550,6 +551,22 @@
             recipes[recipeName] = { name: recipeName, ingredients: updatedIngredients };
 
             alert('Recipe updated successfully!');
+        }
+
+        function deleteRecipe() {
+            const recipeName = document.getElementById('recipeName').value;
+            const ingredientsList = document.getElementById('ingredient-list').children;
+
+            //update the recipe (change later to connect to database)
+            //recipes[recipeName] = { name: recipeName, ingredients: updatedIngredients };
+
+            if (recipes.hasOwnProperty(recipeName)) {
+                delete recipes[recipeName];
+                alert('Recipe deleted successfully');
+            }
+            else {
+                alert('error cannot delete');
+            }
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////
