@@ -127,7 +127,9 @@
             </div>    
             <div class="ingredients-list" id="ingredients-list">
                 <div class="ingredient">
-                    <input type="text" id="ingredientInput" placeholder="Ingredient" required oninput="filterIngredients()">
+                    <select id="ingredientDropdown" required>
+                        <option value="">Select Ingredient</option>
+                    </select>
                     <input type="number" placeholder="Quantity" required min = "0" id="initialQuantity">
                     <select>
                         <option value="Units">Units</option>
@@ -175,10 +177,8 @@
             <div class="description-box">
                 <textarea placeholder="Recipe Description" required></textarea>
             </div>  
-
             <div class="ingredients-list" id="ingredient-list">
                 <div class="ingredient">
-                    <input type="text" id="ingredientInput" placeholder="Ingredient" required oninput="filterIngredients()">
                     <input type="number" placeholder="Quantity" required min = "0">
                     <select>
                         <option value="Units">Units</option>
@@ -394,7 +394,9 @@
 
             //fields for new ingredient
             ingredientDiv.innerHTML = `
-            <input type="text" placeholder="Ingredient" required oninput="filterIngredients()">
+             <select id="ingredientDropdown" required>
+                <option value="">Select Ingredient</option>
+            </select>
             <input type="number" placeholder="Quantity" required min = "0">
             <select>
                 <option value="Units">Units</option>
@@ -493,7 +495,9 @@
             const ingredientDiv = document.createElement('div');
             ingredientDiv.className = 'ingredient-entry';
             ingredientDiv.innerHTML = `
-                <input type="text" class="ingredient-name" placeholder="Ingredient" required>
+                <select id="ingredientDropdown" required>
+                    <option value="">Select Ingredient</option>
+                </select>
                 <input type="number" class="ingredient-quantity" placeholder="Quantity" required min = "0">
                 <select class="ingredient-unit">
                         <option value="Units">Units</option>
