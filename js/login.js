@@ -1,4 +1,5 @@
 // Login
+console.log('login.js loaded');
 document.getElementById('loginForm').addEventListener('submit', function (event) {
     event.preventDefault();
     

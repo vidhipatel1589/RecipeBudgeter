@@ -168,7 +168,8 @@
                 <div class="ingredient">
                     <input type="text" id="ingredientInput" placeholder="Ingredient" required oninput="filterIngredients()">
                     <input type="number" placeholder="Quantity" required>
-                    <select>
+                    <label for="unit">Unit</label>
+                    <select id="unitSelect" name="unitSelect">
                         <option value="Units">Units</option>
                         <option value="Cups">Cups</option>
                         <option value="Pounds">Pounds</option>
@@ -218,9 +219,19 @@
     </div>
 
     <!------------------------------------------------------------------------------------------->
-    <script src="js/login.js"></script>
-    <script src="js/home.js"></script>
-    <script>
+    <script 
+
+        src="js/login.js"
+    ></script>
+
+    <script 
+
+        src="js/home.js"
+    ></script>
+
+    <script 
+      
+    >
 
         function showLogin() {
             document.getElementById('signupWrapper').style.display = 'none';
@@ -438,6 +449,12 @@
                     ingredientDiv.innerHTML = `
                                         <input type="text" value="${ingredient.ingredient}" class="ingredient-name">
                                         <input type="number" value="${ingredient.quantity}" class="ingredient-quantity">
+                                        <select id="unitSelect" name="unitSelect">
+                                            <option value="Units">Units</option>
+                                            <option value="Cups">Cups</option>
+                                            <option value="Pounds">Pounds</option>
+                                            <option value="Ounces">Ounces</option>
+                                        </select>
                                         <input type="text" value="${ingredient.unit}" class="ingredient-unit">
                                         <button type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
                                     `;

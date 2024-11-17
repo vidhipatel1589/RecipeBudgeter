@@ -277,6 +277,11 @@ app.get('/api/getConversion', (req, res) => {
     }
 })
 
+//get units
+app.get ('/api/getItemUnit', (req, res) => {
+    res.status(200).json({ message: 'Get Item Unit' })
+})
+
 app.listen(1337, () => {
     console.log('Server started on 1337')
 })
