@@ -508,12 +508,11 @@
 
                 const quantityInput = ingredientDiv.querySelector('.ingredient-quantity');
                 quantityInput.addEventListener('input', () => {
-                    if (quantityInput.value <script 0) {
+                    if (quantityInput.value < script) {
                         quantityInput.value = 0; // Reset to 0 if negative number is entered
                     }
                 });
-        }
-
+    
         function saveNewRecipe() {
             const recipeName = document.querySelector('.add-recipe-entry input[type="text"]').value; // Recipe Name input
             const recipeDescription = document.querySelector('.add-recipe-entry textarea').value; // Recipe Description input
@@ -659,6 +658,7 @@
                 alert('Select a recipe.');
             }
         }
+    } 
 
     </script>
 </body>
