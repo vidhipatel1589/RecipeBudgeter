@@ -37,7 +37,22 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
     .then(response => response.json())
     .then(data => {
         localStorage.setItem('items', JSON.stringify(data));
+    });
+
+    fetch('http://localhost:1337/api/getAllConversions', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
     })
+    .then(response => response.json())
+    .then(data => {
+        data['ea'].conversion = "1.0";
+        localStorage.setItem('conversions', JSON.stringify(data));
+    })
+    .catch(error => {
+        console.error('Error fetching conversions:', error);
+    });
 });
 
 // Function to fetch user recipes and store in localStorage

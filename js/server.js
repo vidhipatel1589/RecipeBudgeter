@@ -115,12 +115,12 @@ app.post('/api/userRecipe', (req, res) => {
             console.error(err);
             return res.status(500).json({ message: 'Failed to fetch recipes' });
         }
-
+    
         // If no recipes found, return an empty array
         if (recipes.length === 0) {
             return res.status(200).json([]);
         }
-
+    
         // Fetch ingredients for each recipe
         const recipeIDs = recipes.map(recipe => recipe.recipeID);
         const ingredientQuery = `
@@ -129,11 +129,13 @@ app.post('/api/userRecipe', (req, res) => {
                 ri.itemID AS ingredientID,
                 i.itemName AS ingredientName,
                 ri.quantity,
-                ri.unitID,
-                u.unitName,
+                ri.unitID AS RecipeUnitID,
+                u.unitName AS RecipeUnit,
                 i.price,
                 i.size,
                 i.stock,
+                i.unitID AS InventoryUnitID,
+                inv_u.unitName AS InventoryUnit,
                 CASE 
                     WHEN u.unitType = 'ea' THEN 1
                     WHEN u.unitType = 'mass' THEN mu.kgConversion
@@ -143,23 +145,23 @@ app.post('/api/userRecipe', (req, res) => {
             FROM recipe_item ri
             JOIN inventory i ON ri.itemID = i.itemID
             JOIN unit u ON ri.unitID = u.id
+            JOIN unit inv_u ON i.unitID = inv_u.id
             LEFT JOIN mass_unit mu ON u.id = mu.unitID AND u.unitType = 'mass'
             LEFT JOIN volume_unit vu ON u.id = vu.unitID AND u.unitType = 'volume'
             WHERE ri.recipeID IN (?)
         `;
-
-
+    
         connection.query(ingredientQuery, [recipeIDs], (err, ingredients) => {
             if (err) {
                 console.error(err);
                 return res.status(500).json({ message: 'Failed to fetch ingredients' });
             }
-
+    
             // Map ingredients to their corresponding recipes and calculate totalPrice
             const recipeMap = recipes.map(recipe => {
                 const recipeIngredients = ingredients.filter(ing => ing.recipeID === recipe.recipeID);
-                const totalPrice = 0.00;
-
+                const totalPrice = recipeIngredients.reduce((sum, ing) => sum + (ing.price * ing.quantity), 0);
+    
                 return {
                     recipeID: recipe.recipeID,
                     recipeName: recipe.recipeName,
@@ -169,8 +171,10 @@ app.post('/api/userRecipe', (req, res) => {
                         ingredientID: ing.ingredientID,
                         ingredientName: ing.ingredientName,
                         quantity: ing.quantity,
-                        unitID: ing.unitID,
-                        unitName: ing.unitName,
+                        RecipeUnitID: ing.RecipeUnitID,
+                        RecipeUnit: ing.RecipeUnit,
+                        InventoryUnitID: ing.InventoryUnitID,
+                        InventoryUnit: ing.InventoryUnit,
                         price: ing.price,
                         size: ing.size,
                         stock: ing.stock,
@@ -178,10 +182,10 @@ app.post('/api/userRecipe', (req, res) => {
                     }))
                 };
             });
-
+    
             res.status(200).json(recipeMap);
         });
-    });
+    });    
 });
 
 
@@ -233,7 +237,7 @@ app.post('/api/deleteRecipe', (req, res) => {
 // Add Item to Recipe
 app.post('/api/addRecipeItem', (req, res) => {
     const { recipeID, itemID, quantity, unitID } = req.body
-    const query = `INSERT INTO recipe_item (recipeID, itemID, quantity, unitID) VALUES (?, ?, ?)`
+    const query = `INSERT INTO recipe_item (recipeID, itemID, quantity, unitID) VALUES (?, ?, ?, ?)`
     connection.query(query, [recipeID, itemID, quantity, unitID], (err, results) => {
         if (err) {
         console.error(err)
@@ -305,16 +309,49 @@ app.get('/api/getConversion', (req, res) => {
 
 // Get All Items
 app.get('/api/getAllItems', (req, res) => {
-    const query = `SELECT itemID, itemName FROM inventory`
+    const query = `SELECT itemID, itemName FROM inventory`;
     connection.query(query, (err, results) => {
         if (err) {
-        console.error(err)
-        res.status(500).json({ message: 'Failed to get items' })
+            console.error(err);
+            res.status(500).json({ message: 'Failed to get items' });
         } else {
-        res.status(200).json(results)
+            const transformedResults = results.reduce((acc, item) => {
+                acc[item.itemName] = item.itemID;
+                return acc;
+            }, {});
+
+            res.status(200).json(transformedResults);
         }
-    })
-})
+    });
+});
+
+// Get All Unit Conversions
+app.get('/api/getAllConversions', (req, res) => {
+    const query = `
+        SELECT 
+            unit.id AS unitID, 
+            unit.unitName AS unitName, 
+            COALESCE(mass_unit.kgConversion, volume_unit.literConversion) AS conversion
+        FROM unit
+        LEFT JOIN mass_unit ON unit.id = mass_unit.unitID
+        LEFT JOIN volume_unit ON unit.id = volume_unit.unitID;
+    `;
+    connection.query(query, (err, results) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({ message: 'Failed to get conversions' });
+        } else {
+            const conversions = {};
+            results.forEach(row => {
+                conversions[row.unitName] = {
+                    unitID: row.unitID,
+                    conversion: row.conversion
+                };
+            });
+            res.status(200).json(conversions);
+        }
+    });
+});
 
 app.listen(1337, () => {
     console.log('Server started on 1337')
