@@ -114,7 +114,7 @@
     </div>
 
     <!------------------------------------------------------------------------------------------->
-    <!-- for recipe page -->
+    <!-- for add new recipe page -->
     <div class="section" id="add-recipe" style="display: none;">
         <h2>Add Your Recipe</h2>
         <h3 style="text-align: center;">Add your own recipe</h3>
@@ -127,18 +127,15 @@
             </div>    
             <div class="ingredients-list" id="ingredients-list">
                 <div class="ingredient">
-                    <select id="ingredientDropdown" required>
+                    <select class="ingredientDropdown" required>
                         <option value="">Select Ingredient</option>
                     </select>
-                    <input type="number" placeholder="Quantity" required min = "0" id="initialQuantity">
-                    <select>
-                        <option value="Units">Units</option>
-                        <option value="Cups">Cups</option>
-                        <option value="Pounds">Pounds</option>
-                        <option value="Ounces">Ounces</option>
+                    <input type="number" placeholder="Quantity" required min="0" class="initialQuantity">
+                    <select class="unitDropdown" required>
+                        <option value="">Select Units</option>
                     </select>
                     <button type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
-                </div>
+                </div>                
             </div>
 
             <button type="button" onclick="addIngredient()">Add Another Ingredient</button>
@@ -149,23 +146,84 @@
     <script>
         // Prevent negative input for initial quantity field on page load
         document.addEventListener("DOMContentLoaded", () => {
-            const initialQuantityInput = document.getElementById('initialQuantity');
-            initialQuantityInput.addEventListener('input', () => {
-                if (initialQuantityInput.value < 0) {
-                    initialQuantityInput.value = 0;
-                }
+            // Attach event listeners to existing `.initialQuantity` fields
+            const quantityInputs = document.querySelectorAll('.initialQuantity');
+            quantityInputs.forEach(input => {
+                input.addEventListener('input', () => {
+                    if (input.value < 0) {
+                        input.value = 0; // Reset to 0 if negative
+                    }
+                });
             });
         });
+
+        // Populate all ingredient dropdowns
+        function populateAddItemDropdown() {
+            const items = JSON.parse(localStorage.getItem('items')) || {};
+            const dropdowns = document.querySelectorAll('.ingredientDropdown'); // Select all elements with class ingredientDropdown
+
+            dropdowns.forEach(dropdown => {
+                dropdown.innerHTML = '<option value="">Select Ingredient</option>'; // Reset options
+
+                for (const [name, id] of Object.entries(items)) {
+                    const option = document.createElement('option');
+                    option.value = id; // Set value as the item's ID
+                    option.textContent = name; // Set text as the item's name
+                    dropdown.appendChild(option);
+                }
+            });
+        }
+
+        // Populate all unit dropdowns
+        function populateAddUnitDropdown() {
+            const conversions = JSON.parse(localStorage.getItem('conversions')) || {};
+            const dropdowns = document.querySelectorAll('.unitDropdown'); // Select all elements with class unitDropdown
+
+            dropdowns.forEach(dropdown => {
+                dropdown.innerHTML = '<option value="">Select Units</option>'; // Reset options
+
+                for (const unitName of Object.keys(conversions)) {
+                    const option = document.createElement('option');
+                    option.value = unitName; // Set value as the unit name
+                    option.textContent = unitName; // Set text as the unit name
+                    dropdown.appendChild(option);
+                }
+            });
+        }
+
+        // Generalized function to populate any dropdown
+        function populateAddNewDropdown(dropdown, storageKey) {
+            const data = JSON.parse(localStorage.getItem(storageKey)) || {};
+            const dropdowns = dropdown instanceof NodeList || Array.isArray(dropdown) ? dropdown : [dropdown]; // Handle single or multiple elements
+
+            dropdowns.forEach(dd => {
+                dd.innerHTML = '<option value="">Select ' + (storageKey === 'items' ? 'Ingredient' : 'Units') + '</option>'; // Reset options
+
+                for (const [name, value] of Object.entries(data)) {
+                    const option = document.createElement('option');
+                    option.value = value; // Set value (ID for items, name for conversions)
+                    option.textContent = name; // Set text (name for both items and conversions)
+                    dd.appendChild(option);
+                }
+            });
+        }
+
+        // Initial population of dropdowns
+        populateAddItemDropdown();
+        populateAddUnitDropdown();
     </script>
 
     <!------------------------------------------------------------------------------------------->
-    <!-- for recipes section -->
+    <!-- for update a recipe page -->
     <div class="section" id="view-recipes" style="display: none;">
         <h2>List of Recipes</h2>
         <h3 style="text-align: center;">Select a recipe</h3>
         <!-- select recipe -->
-        <select id="chooseRecipeUpdate" onchange="loadRecipeData()">
+        <!-- <select id="chooseRecipeUpdate" onchange="loadRecipeData()"> -->
+        <select id="chooseRecipeUpdate">
             <option value="">Select a recipe</option>
+        </select>
+            
         </select>
 
         <!-- to allow update recipe -->
@@ -197,7 +255,7 @@
     </div>
 
     <!------------------------------------------------------------------------------------------->
-    <!-- for recipe cost section -->
+    <!-- for view recipe cost page -->
     <div class="section" id="view-recipe-cost" style="display: none;">
         <h2>Recipe Cost</h2>
         
@@ -233,6 +291,7 @@
     <!------------------------------------------------------------------------------------------->
     <!-- <script src="js/login.js"></script>
     <script src="js/home.js"></script> -->
-    <script type="module" src="./js/main.js"></script>
+    <script type="module" src="./js/main.js">
+    </script>
 </body>
 </html>

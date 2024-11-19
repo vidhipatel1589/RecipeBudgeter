@@ -6,18 +6,28 @@ export function convertRecipes() {
     }
 
     const formattedRecipes = recipesStorage.reduce((acc, recipe) => {
-        const { recipeName, ingredients } = recipe;
+        const { recipeName, ingredients, description } = recipe;
+
         acc[recipeName] = {
             name: recipeName,
             ingredients: ingredients.map(ingredient => ({
                 ingredient: ingredient.ingredientName,
                 quantity: ingredient.quantity,
-                unit: ingredient.unitName,
+                unit: ingredient.RecipeUnit,
+                unitID: ingredient.RecipeUnitID, 
                 price: ingredient.price || 0,
                 available: parseInt(ingredient.stock, 10) > 0
             })),
-            description: recipe.description
+            description: description,
+            inventory: ingredients.map(ingredient => ({
+                itemID: ingredient.ingredientID,
+                size: ingredient.size,
+                unit: ingredient.InventoryUnit,
+                unitID: ingredient.InventoryUnitID,
+                price: ingredient.price || 0
+            }))
         };
+
         return acc;
     }, {});
 

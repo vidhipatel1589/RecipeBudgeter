@@ -1,4 +1,4 @@
-import { showSection } from './showSection.js';
+import { showSection } from './utils.js';
 export function login() {
     // Login
     console.log('login.js loaded');

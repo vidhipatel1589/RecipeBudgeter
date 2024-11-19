@@ -1,11 +1,11 @@
 import { login } from './login.js';
 import { convertRecipes, getItem } from './home.js';
-import { showSection } from './showSection.js';
+import { showSection } from './utils.js';
 login();
 getItem();
 
 
-function showLogin() {
+export function showLogin() {
     document.getElementById('signupWrapper').style.display = 'none';
     document.querySelector('.wrapper').style.display = 'block';
     document.getElementById('navbar').style.display = 'none';
@@ -13,7 +13,7 @@ function showLogin() {
     document.getElementById('password').value = '';
 }
 
-function showSignup() {
+export function showSignup() {
     document.querySelector('.wrapper').style.display = 'none';
     document.getElementById('signupWrapper').style.display = 'block';
 }
@@ -57,7 +57,7 @@ document.querySelectorAll('.navbar a').forEach(link => {
 ////////////////////////////////////////////////////////////////////////////////////////
 
 //list of clickable recipes on the home page
-function populateRecipeList() {
+export function populateRecipeList() {
     const recipeList = document.getElementById('recipeList');
 
     recipeList.innerHTML = '';
@@ -202,7 +202,7 @@ function populateDropdown() {
 populateDropdown();
 
 //get list of recipes to choose from
-function loadRecipeData() {
+export function loadRecipeData() {
     const chosenRecipeName = document.getElementById('chooseRecipeUpdate').value;
     if (chosenRecipeName) {
         const recipe = recipes[chosenRecipeName];
@@ -419,4 +419,14 @@ function viewRecipeCost() {
         alert('Select a recipe.');
     }
     }
+
 } 
+
+document.addEventListener('DOMContentLoaded', () =>{
+        
+    loadRecipeData();
+    document.getElementById('chooseRecipeUpdate').addEventListener('change', () => {
+        console.log('Recipe changed');
+        loadRecipeData();
+    });
+});
