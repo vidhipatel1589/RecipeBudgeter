@@ -303,6 +303,19 @@ app.get('/api/getConversion', (req, res) => {
     }
 })
 
+// Get All Items
+app.get('/api/getAllItems', (req, res) => {
+    const query = `SELECT itemID, itemName FROM inventory`
+    connection.query(query, (err, results) => {
+        if (err) {
+        console.error(err)
+        res.status(500).json({ message: 'Failed to get items' })
+        } else {
+        res.status(200).json(results)
+        }
+    })
+})
+
 app.listen(1337, () => {
     console.log('Server started on 1337')
 })

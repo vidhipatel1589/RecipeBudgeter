@@ -27,6 +27,17 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
         console.error('Error:', error);
         alert('Error logging in');
     });
+
+    fetch('http://localhost:1337/api/getAllItems', {   
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        localStorage.setItem('items', JSON.stringify(data));
+    })
 });
 
 // Function to fetch user recipes and store in localStorage
