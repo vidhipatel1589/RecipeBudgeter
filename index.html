@@ -127,8 +127,10 @@
             </div>    
             <div class="ingredients-list" id="ingredients-list">
                 <div class="ingredient">
-                    <input type="text" id="ingredientInput" placeholder="Ingredient" required oninput="filterIngredients()">
-                    <input type="number" placeholder="Quantity" required>
+                    <select id="ingredientDropdown" required>
+                        <option value="">Select Ingredient</option>
+                    </select>
+                    <input type="number" placeholder="Quantity" required min = "0" id="initialQuantity">
                     <select>
                         <option value="Units">Units</option>
                         <option value="Cups">Cups</option>
@@ -143,6 +145,18 @@
             <button type="button" onclick="saveNewRecipe()">Save Recipe</button>
         </form>
     </div>
+
+    <script>
+        // Prevent negative input for initial quantity field on page load
+        document.addEventListener("DOMContentLoaded", () => {
+            const initialQuantityInput = document.getElementById('initialQuantity');
+            initialQuantityInput.addEventListener('input', () => {
+                if (initialQuantityInput.value < 0) {
+                    initialQuantityInput.value = 0;
+                }
+            });
+        });
+    </script>
 
     <!------------------------------------------------------------------------------------------->
     <!-- for recipes section -->
@@ -163,13 +177,10 @@
             <div class="description-box">
                 <textarea placeholder="Recipe Description" required></textarea>
             </div>  
-
             <div class="ingredients-list" id="ingredient-list">
                 <div class="ingredient">
-                    <input type="text" id="ingredientInput" placeholder="Ingredient" required oninput="filterIngredients()">
-                    <input type="number" placeholder="Quantity" required>
-                    <label for="unit">Unit</label>
-                    <select id="unitSelect" name="unitSelect">
+                    <input type="number" placeholder="Quantity" required min = "0">
+                    <select>
                         <option value="Units">Units</option>
                         <option value="Cups">Cups</option>
                         <option value="Pounds">Pounds</option>
@@ -180,7 +191,8 @@
             </div>
 
             <button type="button" onclick="addAnotherIngredient()">Add Another Ingredient</button>
-            <button type="button" onclick="saveRecipe()">Save Recipe</button>
+            <button type="button" onclick="updateRecipe()">Save Recipe</button>
+            <button type="button" onclick="deleteRecipe()">Delete Recipe</button>
         </form>
     </div>
 
@@ -219,370 +231,8 @@
     </div>
 
     <!------------------------------------------------------------------------------------------->
-    <script 
-
-        src="js/login.js"
-    ></script>
-
-    <script 
-
-        src="js/home.js"
-    ></script>
-
-    <script 
-      
-    >
-
-        function showLogin() {
-            document.getElementById('signupWrapper').style.display = 'none';
-            document.querySelector('.wrapper').style.display = 'block';
-            document.getElementById('navbar').style.display = 'none';
-               document.getElementById('username').value = '';
-    document.getElementById('password').value = '';
-        }
-
-        function showSignup() {
-            document.querySelector('.wrapper').style.display = 'none';
-            document.getElementById('signupWrapper').style.display = 'block';
-        }
-
-        //hide other pages when switching through pages on nav bar
-        function showSection(sectionId) {
-            //get sections
-            const sections = document.querySelectorAll('.section');
-
-            //hide other sections
-            sections.forEach(section => {
-                section.style.display = 'none';
-            });
-
-            //show selected section
-            document.getElementById(sectionId).style.display = 'block';
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////
-
-        // temporary list of ingredients, get from database instead later
-        // const ingredients = [
-        //     "Salt",
-        //     "Pepper",
-        //     "Eggs",
-        //     "Butter",
-        //     "Rice",
-        //     "Spinach",
-        //     "Onion",
-        //     "Tomato",
-        //     "Olive oil",
-        //     "Chicken"
-        // ];
-
-        // temporary list of recipes, get from database later
-        // const recipes = {
-        //     "Omelet": { name: "Omelet", ingredients: [{ ingredient: "Eggs", quantity: 2, unit: "Units", price: 0.50, available: true }, { ingredient: "spinach", quantity: 10, unit: "Ounces", price: 0.20, available: true }] },
-        //     "Chicken and Rice": { name: "Chicken and Rice", ingredients: [{ ingredient: "chicken", quantity: 1, unit: "Pounds",available: false }, { ingredient: "rice", quantity: 1, unit: "Cups", price: 1.20, available: true }] }, 
-        // };
-
-        const recipes = convertRecipes();
-
-        ////////////////////////////////////////////////////////////////////////////////////////
-
-        document.querySelectorAll('.navbar a').forEach(link => {
-            link.addEventListener('click', function (event) {
-                event.preventDefault();
-                const targetSection = this.getAttribute('href').substring(1);
-                showSection(targetSection);
-            });
-        });
-
-        ////////////////////////////////////////////////////////////////////////////////////////
-
-        //list of clickable recipes on the home page
-        function populateRecipeList() {
-            const recipeList = document.getElementById('recipeList');
-
-            recipeList.innerHTML = '';
-
-            for (const recipeName in recipes) {
-                const recipeItem = document.createElement('div');
-                recipeItem.className = 'recipe-item';
-                recipeItem.textContent = recipeName;
-                recipeItem.onclick = () => showRecipeDetailsOnHome(recipeName);
-                recipeList.appendChild(recipeItem);
-                
-            }
-        }
-        populateRecipeList();
-
-        function showRecipeDetailsOnHome(chosenRecipeName) {
-            const recipeDetailsDiv = document.getElementById('recipeCostDetailsHome');
-            const ingredientCostList = document.getElementById('ingredientCostListHome');
-            const totalCostElement = document.getElementById('totalCostHome');
-
-            if (chosenRecipeName && recipes[chosenRecipeName]) {
-                const recipe = recipes[chosenRecipeName];
-                document.getElementById('chosenRecipeNameHome').textContent = recipe.name;
-                const recipeDescription = document.getElementById('recipeDescriptionBox');
-
-                ingredientCostList.innerHTML = '';
-                recipeDescription.value = recipe.description;
-
-                let totalCost = 0;
-
-
-                recipe.ingredients.forEach((ingredient) => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                <td>${ingredient.ingredient}</td>
-                <td>${ingredient.quantity}</td>
-                <td>${ingredient.unit}</td>
-                <td>$${(ingredient.price * ingredient.quantity).toFixed(2)}</td>
-                <td>${ingredient.available ? "In Stock" : "Out of Stock"}</td>
-            `;
-                    ingredientCostList.appendChild(row);
-                    totalCost += ingredient.price * ingredient.quantity;
-                });
-
-
-                totalCostElement.textContent = `$${totalCost.toFixed(2)}`;
-                recipeDetailsDiv.style.display = 'block';
-            } else {
-                recipeDetailsDiv.style.display = 'none';
-            }
-        }
-
-        ///////////////////////////////////////////////////////////////////////////////////////
-
-        //when user types, it'll find the ingredient in the list
-        function filterIngredients() {
-            const input = document.getElementById('ingredientInput');
-            const filter = input.value.toLowerCase();
-            const dropdown = document.getElementById('dropdownContent');
-            dropdown.innerHTML = ''; // Clear previous results
-
-            if (filter) {
-                const filteredIngredients = ingredients.filter(ingredient => ingredient.toLowerCase().includes(filter));
-
-                filteredIngredients.forEach(ingredient => {
-                    const div = document.createElement('div');
-                    div.textContent = ingredient;
-                    div.onclick = () => selectIngredient(ingredient);
-                    dropdown.appendChild(div);
-                });
-
-                //show list
-                dropdown.style.display = filteredIngredients.length > 0 ? 'block' : 'none';
-            } else {
-                dropdown.style.display = 'none'; //if none match
-            }
-        }
-
-        //choose from dropdown list
-        function selectIngredient(ingredient) {
-            document.getElementById('ingredientInput').value = ingredient;
-            document.getElementById('dropdownContent').style.display = 'none';
-        }
-
-        //to add another ingredient when listing ingredients for new recipe
-        function addIngredient() {
-            const ingredientsList = document.getElementById('ingredients-list');
-
-            const ingredientDiv = document.createElement('div');
-            ingredientDiv.className = 'ingredient';
-
-            //fields for new ingredient
-            ingredientDiv.innerHTML = `
-            <input type="text" placeholder="Ingredient" required oninput="filterIngredients()">
-            <input type="number" placeholder="Quantity" required>
-            <select>
-                <option value="Units">Units</option>
-                <option value="Cups">Cups</option>
-                <option value="Pounds">Pounds</option>
-                <option value="Ounces">Ounces</option>
-            </select>
-            <button type="button" class="X-button"  onclick="deleteIngredient(this)">X</button>
-        `;
-
-            ingredientsList.appendChild(ingredientDiv);
-        }
-
-        function deleteIngredient(button) {
-            const ingredientDiv = button.parentElement; // Get the parent div of the delete button
-            ingredientDiv.remove(); // Remove the ingredient row from the DOM
-        }
-
-
-        ////////////////////////////////////////////////////////////////////////////////////////
-
-        //dropdown for recipes
-        function populateDropdown() {
-            const dropdown = document.getElementById('chooseRecipeUpdate');
-            dropdown.innerHTML = ''; // Clear the previous options
-            const uniqueRecipes = new Set(); // Use a Set to track unique recipe names
-
-            for (let recipeName in recipes) {
-                if (!uniqueRecipes.has(recipeName)) { // Check for duplicates
-                    uniqueRecipes.add(recipeName);
-                    const option = document.createElement('option');
-                    option.value = recipeName;
-                    option.textContent = recipeName;
-                    dropdown.appendChild(option);
-                }
-            }
-        }
-        populateDropdown();
-
-        //get list of recipes to choose from
-        function loadRecipeData() {
-            const chosenRecipeName = document.getElementById('chooseRecipeUpdate').value;
-            if (chosenRecipeName) {
-                const recipe = recipes[chosenRecipeName];
-                document.getElementById('recipeName').value = recipe.name;
-
-                //clear out previous
-                const ingredientsList = document.getElementById('ingredient-list');
-                ingredientsList.innerHTML = '';
-
-                //list out the ingredients
-                recipe.ingredients.forEach((ingredient, index) => {
-                    const ingredientDiv = document.createElement('div');
-                    ingredientDiv.className = 'ingredient-entry';
-                    ingredientDiv.innerHTML = `
-                                        <input type="text" value="${ingredient.ingredient}" class="ingredient-name">
-                                        <input type="number" value="${ingredient.quantity}" class="ingredient-quantity">
-                                        <select id="unitSelect" name="unitSelect">
-                                            <option value="Units">Units</option>
-                                            <option value="Cups">Cups</option>
-                                            <option value="Pounds">Pounds</option>
-                                            <option value="Ounces">Ounces</option>
-                                        </select>
-                                        <input type="text" value="${ingredient.unit}" class="ingredient-unit">
-                                        <button type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
-                                    `;
-                    ingredientsList.appendChild(ingredientDiv);
-                });
-
-                //show form to update recipe
-                document.getElementById('updateRecipeForm').style.display = 'block';
-            } else {
-                //clear if no recipe chosen
-                document.getElementById('updateRecipeForm').style.display = 'none';
-            }
-        }
-
-        //add another ingredient to recipe
-        function addAnotherIngredient() {
-            const ingredientsList = document.getElementById('ingredient-list');
-
-            const ingredientDiv = document.createElement('div');
-            ingredientDiv.className = 'ingredient-entry';
-            ingredientDiv.innerHTML = `
-                <input type="text" class="ingredient-name" placeholder="Ingredient" required>
-                <input type="number" class="ingredient-quantity" placeholder="Quantity" required>
-                <select class="ingredient-unit">
-                        <option value="Units">Units</option>
-                        <option value="Cups">Cups</option>
-                        <option value="Pounds">Pounds</option>
-                        <option value="Ounces">Ounces</option>
-                </select>
-                <button type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
-                `;
-
-                ingredientsList.appendChild(ingredientDiv);
-        }
-
-        function saveNewRecipe() {
-            const recipeName = document.querySelector('.add-recipe-entry input[type="text"]').value; // Recipe Name input
-            const ingredientsList = document.querySelectorAll('#ingredients-list .ingredient'); // All ingredients added
-
-            const newIngredients = Array.from(ingredientsList).map(ingredientDiv => ({
-                ingredient: ingredientDiv.querySelector('input[type="text"]').value,
-                quantity: parseFloat(ingredientDiv.querySelector('input[type="number"]').value),
-                unit: ingredientDiv.querySelector('select').value
-        }));
-
-        if (!recipes[recipeName]) {
-        recipes[recipeName] = { name: recipeName, ingredients: newIngredients };
-        alert('Recipe added successfully!');
-        populateDropdown(); 
-        populateRecipeCostDropdown(); 
-        }   else {
-        alert('A recipe with this name already exists.');
-    }
-}
-        function saveRecipe() {
-            const recipeName = document.getElementById('recipeName').value;
-            const ingredientsList = document.getElementById('ingredient-list').children;
-
-            const updatedIngredients = Array.from(ingredientsList).map(ingredientDiv => ({
-                ingredient: ingredientDiv.querySelector('.ingredient-name').value,
-                quantity: parseFloat(ingredientDiv.querySelector('.ingredient-quantity').value),
-                unit: ingredientDiv.querySelector('.ingredient-unit').value
-            }));
-
-            //update the recipe (change later to connect to database)
-            recipes[recipeName] = { name: recipeName, ingredients: updatedIngredients };
-
-            alert('Recipe updated successfully!');
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////
-
-        //shows dropdown for the recipes to select from to show cost
-        function populateRecipeCostDropdown() {
-            const dropdown = document.getElementById('chooseRecipeCost');
-            dropdown.innerHTML = '<option value="">Select a recipe</option>'; //to reset
-
-            for (const recipeName in recipes) {
-                const option = document.createElement('option');
-                option.value = recipeName;
-                option.textContent = recipeName;
-                dropdown.appendChild(option);
-            }
-        }
-        populateRecipeCostDropdown();
-
-        //show recipe cost details
-        function viewRecipeCost() {
-            const chosenRecipeName = document.getElementById('chooseRecipeCost').value;
-            const recipeDetailsDiv = document.getElementById('recipeCostDetails');
-            const ingredientCostList = document.getElementById('ingredientCostList');
-            const totalCostElement = document.getElementById('totalCost');
-
-            if (chosenRecipeName && recipes[chosenRecipeName]) {
-                const recipe = recipes[chosenRecipeName];
-                document.getElementById('chosenRecipeName').textContent = recipe.name;
-
-                const recipeDescription = document.getElementById('recipeDescriptionCostBox');
-                recipeDescription.value = recipe.description;
-                ingredientCostList.innerHTML = '';
-                let totalCost = 0;  //to start with then add the costs
-                
-
-                //show the list of recipe details with cost
-                recipe.ingredients.forEach((ingredient) => {
-                    const row = document.createElement('tr');
-
-                    row.innerHTML = `
-                                    <td>${ingredient.ingredient}</td>
-                                    <td>${ingredient.quantity}</td>
-                                    <td>${ingredient.unit}</td>
-                                    <td>$${(ingredient.price * ingredient.quantity).toFixed(2)}</td>
-                                    <td>${ingredient.available ? "In Stock" : "Out of Stock"}</td>
-                                `;
-
-                    ingredientCostList.appendChild(row);
-                    totalCost += ingredient.price * ingredient.quantity;
-                });
-
-                totalCostElement.textContent = `$${totalCost.toFixed(2)}`;
-                recipeDetailsDiv.style.display = 'block';
-            } else {
-                recipeDetailsDiv.style.display = 'none';
-                alert('Select a recipe.');
-            }
-        }
-
-    </script>
-
+    <!-- <script src="js/login.js"></script>
+    <script src="js/home.js"></script> -->
+    <script type="module" src="./js/main.js"></script>
 </body>
 </html>

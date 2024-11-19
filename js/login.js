@@ -1,34 +1,38 @@
-// Login
-console.log('login.js loaded');
-document.getElementById('loginForm').addEventListener('submit', function (event) {
-    event.preventDefault();
-    
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
+import { showSection } from './showSection.js';
+export function login() {
+    // Login
+    console.log('login.js loaded');
+    document.getElementById('loginForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
 
-    // Login API request
-    fetch('http://localhost:1337/api/login', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ username, password })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.message === 'Login successful') {
-            // Store the userID in localStorage
-            localStorage.setItem('userID', data.userID);
-            fetchUserRecipes(data.userID);
-        } else {
-            alert('Invalid username or password');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error logging in');
+        // Login API request
+        fetch('http://localhost:1337/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === 'Login successful') {
+                // Store the userID in localStorage
+                localStorage.setItem('userID', data.userID);
+                fetchUserRecipes(data.userID);
+            } else {
+                alert('Invalid username or password');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error logging in');
+        });
     });
-});
+}
+
 
 // Function to fetch user recipes and store in localStorage
 function fetchUserRecipes(userID) {

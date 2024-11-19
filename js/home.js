@@ -1,4 +1,4 @@
-function convertRecipes() {
+export function convertRecipes() {
     const recipesStorage = JSON.parse(localStorage.getItem('recipes'));
     if (!recipesStorage) {
         console.error("No recipes found in localStorage");
@@ -22,6 +22,10 @@ function convertRecipes() {
     }, {});
 
     return formattedRecipes;
+}
+
+export function getItem() {
+    localStorage.getItem('recipes')
 }
 
 
