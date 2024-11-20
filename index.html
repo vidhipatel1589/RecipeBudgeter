@@ -330,7 +330,7 @@
             <div class="description-box">
                 <textarea placeholder="Recipe Description" required></textarea>
             </div>  
-            <div class="ingredients-list" id="ingredient-list">
+            <div class="ingredients-list" id="update-ingredient-list">
                 <div class="ingredient">
                     <input type="number" placeholder="Quantity" required min = "0">
                     <select>
@@ -856,33 +856,37 @@
         //get list of recipes to choose from
         function loadRecipeData() {
             const chosenRecipeID = Number(document.getElementById('chooseRecipeUpdate').value);
-            Promise.all([getAllUnits(), getRecipeItems(chosenRecipeID), getRecipe(chosenRecipeID)])
-                .then(([ units, recipeItems, recipe]) => {
+            Promise.all([getAllUnits(), getRecipeItems(chosenRecipeID), getRecipe(chosenRecipeID), getItemsWithUnits()])
+                .then(([ units, recipeItems, recipe, itemsWithUnits]) => {
                     //console.log('Units by type:', unitsByType);
                     console.log('Recipe items:', recipeItems);
                     console.log('Recipe:', recipe);
 
-                    document.getElementById('recipe-name').value = recipe.name;
-                    document.querySelector('#updateRecipeForm textarea').value = recipe.description;
-                    const ingredientsList = document.getElementById('ingredient-list');
+                    document.getElementById('recipe-name').value = recipe[0]?.recipeName;
+                    document.querySelector('#updateRecipeForm textarea').value = recipe[0]?.description;
+                    const ingredientsList = document.getElementById('update-ingredient-list');
                     //clear out previous
                     ingredientsList.innerHTML = '';
                     recipeItems.forEach(item => {
+                        const itemID = item.itemID;
+                        console.log('Item:', item);
                         const unitID = item.unitID;
                         const unitType = units.units.find(unit => unit.id === unitID)?.unitType ?? "";
+                        console.log('Unit type:', unitType);
                         const validUnits = units.units.filter(unit => unit.unitType === unitType).map(unit => ({id: unit.id, name: unit.unitName}));
+                        console.log('Valid units:', validUnits);
                         const ingredientDiv = document.createElement('div');
                         ingredientDiv.className = 'ingredient-entry';
                         ingredientDiv.innerHTML = `
-                            <input type="text" value="${item.itemName}" class="ingredient-name">
+                            <input type="text" value="${itemsWithUnits.find(itemWithUnit => itemID === itemWithUnit.itemID).itemName}" class="ingredient-name">
                             <input type="number" value="${item.quantity}" class="ingredient-quantity" min="0">
-                            <select class="ingredient
-                            -unit">
+                            <select class="ingredient-unit">
                                 ${validUnits.map(unit => `<option value="${unit.id}">${unit.name}</option>`).join('')}
                             </select>
                             <button type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
                         `;
                         ingredientsList.appendChild(ingredientDiv);
+                        document.getElementById('updateRecipeForm').style.display = 'block';
                     });
 
 
@@ -931,7 +935,7 @@
                         document.getElementById('updateRecipeForm').style.display = 'block';
                     } else {
                         //clear if no recipe chosen
-                        document.getElementById('updateRecipeForm').style.display = 'none';
+                        //document.getElementById('updateRecipeForm').style.display = 'none';
                     }
                 })
                 .catch(error => {
