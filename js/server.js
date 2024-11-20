@@ -444,6 +444,31 @@ app.get('/api-v2/user/recipes', (req, res) => {
         }
     });
 })
+app.get('/api-v2/recipe/items', (req, res) => {
+    const recipeID = Number(req.query.recipeID);
+    const query = `SELECT itemID, quantity, unitID FROM recipe_item WHERE recipeID = ?`;
+    connection.query(query, [recipeID], (err, results) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({ message: 'Failed to get recipe items' });
+        } else {
+            res.status(200).json(results);
+        }
+    });
+})
+
+app.get('/api-v2/recipe', (req, res) => {
+    const recipeID = Number(req.query.recipeID);
+    const query = `SELECT recipeID, recipeName, description, userID FROM recipe WHERE recipeID = ?`;
+    connection.query(query, [recipeID], (err, results) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({ message: 'Failed to get recipe' });
+        } else {
+            res.status(200).json(results);
+        }
+    });
+});
 
 app.listen(1337, () => {
     console.log('Server started on 1337')

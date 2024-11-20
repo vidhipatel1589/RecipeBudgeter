@@ -317,7 +317,7 @@
         <h2>List of Recipes</h2>
         <h3 style="text-align: center;">Select a recipe</h3>
         <!-- select recipe -->
-        <select id="chooseRecipeUpdate" onchange="loadRecipeData()">
+        <select id="chooseRecipeUpdate" >
             <option value="">Select a recipe</option>
         </select>
 
@@ -758,45 +758,119 @@
         }
 
 
+        function getUserRecipes(userID) {
+            const url = new URL('http://localhost:1337/api-v2/user/recipes');
+            url.searchParams.append('userID', userID);
 
+            return fetch(url, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('HTTP Error: ' + response.status);
+                    }
+                    return response.json(); // Return the parsed JSON data
+                })
+                .then(data => {
+                    return data; // Return the data to the caller
+                })
+                .catch(error => {
+                    console.error('Error fetching recipes:', error);
+                    alert('Error fetching recipes');
+                });
+        }
         ////////////////////////////////////////////////////////////////////////////////////////
 
         //dropdown for recipes
         function populateDropdown() {
-            const dropdown = document.getElementById('chooseRecipeUpdate');
-            dropdown.innerHTML = ''; // Clear the previous options
-            const uniqueRecipes = new Set(); // Use a Set to track unique recipe names
+            getUserRecipes(localStorage.getItem('userID'))
+                .then(recipes => {
+                    console.log('Recipes:', recipes);
+                    const dropdown = document.getElementById('chooseRecipeUpdate');
+                    dropdown.innerHTML = ''; // Clear the previous options
+                    const uniqueRecipes = new Set(); // Use a Set to track unique recipe names
 
-            for (let recipeName in recipes) {
-                if (!uniqueRecipes.has(recipeName)) { // Check for duplicates
-                    uniqueRecipes.add(recipeName);
-                    const option = document.createElement('option');
-                    option.value = recipeName;
-                    option.textContent = recipeName;
-                    dropdown.appendChild(option);
-                }
-            }
+                    recipes.forEach(recipe => {
+                        const option = document.createElement('option');
+                        option.value = recipe.recipeID;
+                        option.textContent = recipe.recipeName;
+                        dropdown.appendChild(option);  
+                    })
+                })
+                .catch(error => {
+                    console.error('Failed to fetch recipes:', error);
+                });
+            
         }
         populateDropdown();
 
+        function getRecipe(recipeID) {
+            const url = new URL('http://localhost:1337/api-v2/recipe');
+            url.searchParams.append('recipeID', recipeID);
+
+            return fetch(url, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('HTTP Error: ' + response.status);
+                    }
+                    return response.json(); // Return the parsed JSON data
+                })
+                .then(data => {
+                    return data; // Return the data to the caller
+                })
+                .catch(error => {
+                    console.error('Error fetching recipe:', error);
+                    alert('Error fetching recipe');
+                });
+        }
+
+        function getRecipeItems(recipeID) {
+            const url = new URL('http://localhost:1337/api-v2/recipe/items');
+            url.searchParams.append('recipeID', recipeID);
+
+            return fetch(url, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('HTTP Error: ' + response.status);
+                    }
+                    return response.json(); // Return the parsed JSON data
+                })
+                .then(data => {
+                    return data; // Return the data to the caller
+                })
+                .catch(error => {
+                    console.error('Error fetching recipe items:', error);
+                    alert('Error fetching recipe items');
+                });
+        }
+
+        chooseRecipeUpdate.addEventListener('change', loadRecipeData);
+
         //get list of recipes to choose from
         function loadRecipeData() {
-            getAllUnits()
-                .then(units => {
-                    //console.log('Units:', units);
-                    return getUnitsByType().then(unitsByType => ({ units, unitsByType }));
-                })
-                .then(({ units, unitsByType}) => {
+            const chosenRecipeID = Number(document.getElementById('chooseRecipeUpdate').value);
+            Promise.all([getAllUnits(), getRecipeItems(chosenRecipeID), getRecipe(chosenRecipeID)])
+                .then(([ units, recipeItems, recipe]) => {
                     //console.log('Units by type:', unitsByType);
-                    
-                
-                    const chosenRecipeName = document.getElementById('chooseRecipeUpdate').value;
-                    if (chosenRecipeName) {
-                        const recipe = recipes[chosenRecipeName];
-                        localStorage.setItem('recipeID', recipe.recipeID);
-                        document.getElementById('recipeName').value = recipe.name;
+                    console.log('Recipe items:', recipeItems);
+                    console.log('Recipe:', recipe);
 
-                        document.querySelector('#updateRecipeForm textarea').value = recipe.description;
+                    document.getElementById('recipeName').value = recipe.name;
+                    document.querySelector('#updateRecipeForm textarea').value = recipe.description;
+
+                    if (chosenRecipeID) {
+                        const recipe = recipes[chosenRecipeID];
+                        //localStorage.setItem('recipeID', recipe.recipeID);
+                        
+
+                        
 
                         //clear out previous
                         const ingredientsList = document.getElementById('ingredient-list');
