@@ -68,7 +68,7 @@
     <nav class="navbar" id="navbar" style="display: none;">
         <ul>
             <li><a href="#home">Home</a></li>
-            <li><a href="#add-recipe">Add A New Recipe</a></li>
+            <li><a id="add-recipe-link" href="#add-recipe">Add A New Recipe</a></li>
             <li><a id="update-recipe-link" href="#view-recipes">Update A Recipe</a></li>
             <li><a href="#" onclick="showLogin()">Logout</a></li>
         </ul>
@@ -135,7 +135,10 @@
 
     <script>
 
-        
+        const addRecipeLink = document.getElementById('add-recipe-link');
+        addRecipeLink.addEventListener('click', () => {
+            showSection('add-recipe');
+        });
 
         const updateRecipeLink = document.getElementById('update-recipe-link');
         updateRecipeLink.addEventListener('click', () => {
@@ -389,6 +392,32 @@
     <script src="js/home.js"></script>
     <script src="js/updateRecipe.js"></script>
     <script>
+
+        const updateDeleteRecipeButton = document.getElementById('update-delete-recipe-button');
+        updateDeleteRecipeButton.addEventListener('click', () => {
+            const recipeID = Number(document.getElementById('chooseRecipeUpdate').value);
+            deleteRecipe(recipeID);
+        });
+
+        function deleteRecipe(recipeID) {
+            const userID = Number(localStorage.getItem('userID'));
+            fetch('http://localhost:1337/api-v2/deleteRecipe', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ recipeID, userID })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Recipe deleted:', data);
+                    alert('Recipe deleted');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error deleting recipe');
+                });
+        }
         
         function getAllUnits() {
             //console.log('fetching all units');
@@ -892,15 +921,15 @@
                         const validUnits = units.units.filter(unit => unit.unitType === unitType).map(unit => ({id: unit.id, name: unit.unitName}));
                         // console.log('Valid units:', validUnits);
                         const ingredientDiv = document.createElement('div');
-                        ingredientDiv.className = 'ingredient-entry';
+                        ingredientDiv.className = 'update-ingredient-entry';
                         ingredientDiv.innerHTML = `
                             <select class="ingredient-dropdown" required>
                                 ${itemsWithUnits.map(itemWithUnit => `<option value="${itemWithUnit.itemID}" data-unit-id="${itemWithUnit.unitID}">${itemWithUnit.itemName}</option>`).join('')}
                             </select>
                             
-                            <input type="number" value="${item.quantity}" class="ingredient-quantity" min="0">
-                            <select class="ingredient-unit">
-                                ${validUnits.map(unit => `<option value="${unit.id}">${unit.name}</option>`).join('')}
+                            <input type="number" value="${item.quantity}" class="update-ingredient-quantity" min="0">
+                            <select class="update-ingredient-unit">
+                                ${validUnits.map(unit => `<option value=${unit.id}>${unit.name}</option>`).join('')}
                             </select>
                             <button type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
                         `;
@@ -909,7 +938,7 @@
                         const ingredientDropdown = ingredientDiv.querySelector('.ingredient-dropdown');
                         ingredientDropdown.value = item.itemID;
 
-                        const unitDropdown = ingredientDiv.querySelector('.ingredient-unit');
+                        const unitDropdown = ingredientDiv.querySelector('.update-ingredient-unit');
                         ingredientDropdown.addEventListener('change', () => {
                             const selectedOption = ingredientDropdown.options[ingredientDropdown.selectedIndex];
                             // console.log('Selected option:', selectedOption);
@@ -928,7 +957,7 @@
                             });
                         });
                         document.getElementById('updateRecipeForm').style.display = 'block';
-                        document.querySelectorAll('.ingredient-quantity').forEach(input => {
+                        document.querySelectorAll('.update-ingredient-quantity').forEach(input => {
                         input.addEventListener('input', () => {
                             if (input.value < 0) {
                                 input.value = 0; // Reset to 0 if negative number is entered
@@ -996,7 +1025,7 @@
             const ingredientsList = document.getElementById('ingredient-list');
 
             const ingredientDiv = document.createElement('div');
-            ingredientDiv.className = 'ingredient-entry';
+            ingredientDiv.className = 'update-ingredient-entry';
             ingredientDiv.innerHTML = `
                 <select id="ingredientDropdown" required>
                     <option value="">Select Ingredient</option>
@@ -1021,29 +1050,37 @@
                 });
         }
 
-        const recipeSelector = document.getElementById('chooseRecipeUpdate');
-        const recipeForm = document.getElementById('updateRecipeForm');
-        const recipeNameInput = document.getElementById('recipe-name');
-        const descriptionTextarea = document.getElementById('recipe-description');
-        const ingredientsListDiv = document.getElementById('update-ingredients-list');
+        
         const saveRecipeButton = document.getElementById('save-recipe-button');
-
         saveRecipeButton.addEventListener('click', updateRecipe);
 
         async function updateRecipe() {
+            const recipeSelector = document.getElementById('chooseRecipeUpdate');
+            const recipeForm = document.getElementById('updateRecipeForm');
+            const recipeNameInput = document.getElementById('recipe-name');
+            const descriptionTextarea = document.getElementById('recipe-description');
+            const ingredientsListDiv = document.getElementById('update-ingredients-list');
+        
             const recipeID = parseInt(recipeSelector.value);
             const recipeName = recipeNameInput.value;
             const description = descriptionTextarea.value;
-            const ingredientElements = ingredientsListDiv.querySelectorAll('.ingredient-entry');
+            const ingredientElements = ingredientsListDiv.querySelectorAll('.update-ingredient-entry');
             const recipeItems = [];
 
             ingredientElements.forEach(ingredientElement => {
-                const quantityInput = ingredientElement.querySelector('.ingredient-quantity');
-                const itemSelect = ingredientElement.querySelector('select');
-                const unitSelect = ingredientElement.querySelector('select:nth-of-type(2)');
+                //console.log('Ingredient element:', ingredientElement);
+                const quantityInput = ingredientElement.querySelector('.update-ingredient-quantity');
+                //console.log('Quantity input:', quantityInput);
+                //console.log('Quantity input value:', quantityInput.value);
+                const itemSelect = ingredientElement.querySelector('.ingredient-dropdown');
+                const unitSelect = ingredientElement.querySelector('.update-ingredient-unit');
+                //console.log('Unit select:', unitSelect);
+                //console.log('Unit select value:', unitSelect.value);
                 const quantity = parseFloat(quantityInput.value);
                 const unitID = parseInt(unitSelect.value);
+                //console.log('Unit ID:', unitID);
                 const itemID = parseInt(itemSelect.value);
+                //console.log('Item ID:', itemID);
                 if(!isNaN(quantity) && unitID && itemID) {
                     recipeItems.push({ 
                         itemID: itemID, 
@@ -1081,28 +1118,28 @@
                 alert('Error updating recipe');
             }
         }
-        const addIngredientButton = document.getElementById('update-add-ingredient-button');
+        //const addIngredientButton = document.getElementById('update-add-ingredient-button');
         // addIngredientButton.addEventListener('click', addUpdateRow(itemsWithUnits, units));
 
         function addUpdateRow(itemsWithUnits, units) {
             console.log('Adding new row');
             const ingredientsList = document.getElementById('update-ingredients-list');
             const ingredientDiv = document.createElement('div');
-            ingredientDiv.className = 'ingredient-entry';
+            ingredientDiv.className = 'update-ingredient-entry';
             ingredientDiv.innerHTML = `
-                <select class = "ingredient-dropdown" required>
+                <select value="" class="ingredient-dropdown" required>
                     <option value="">Select Ingredient</option>
                     ${itemsWithUnits.map(item => `<option value="${item.itemID}" data-unit-id="${item.unitID}">${item.itemName}</option>`).join('')}
                 </select>
-                <input type="number" class="ingredient-quantity" placeholder="Quantity" required min = "0">
-                <select class="unitDropdown" required>
+                <input value=0 type="number" class="update-ingredient-quantity" placeholder="Quantity" required min = "0">
+                <select value="" class="update-ingredient-unit" required>
                     <option value="">Select Units</option>
                 </select>
                 <button type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
                 `;
             ingredientsList.appendChild(ingredientDiv);
             const ingredientDropdown = ingredientDiv.querySelector('.ingredient-dropdown');
-            const unitDropdown = ingredientDiv.querySelector('.unitDropdown');
+            const unitDropdown = ingredientDiv.querySelector('.update-ingredient-unit');
 
             ingredientDropdown.addEventListener('change', () => {
                 const selectedOption = ingredientDropdown.options[ingredientDropdown.selectedIndex];
@@ -1117,18 +1154,19 @@
                 const filteredUnits = units.units.filter(unit => unit.unitType === unitType);
                 filteredUnits.forEach(unit => {
                     const option = document.createElement('option');
-                    option.value = unit.unitID;
+                    option.value = unit.id;
                     option.textContent = unit.unitName;
                     unitDropdown.appendChild(option);
                 });
             });
 
-            const newQuantityInput = ingredientDiv.querySelector('.ingredient-quantity');
+            const newQuantityInput = ingredientDiv.querySelector('.update-ingredient-quantity');
             newQuantityInput.addEventListener('input', () => {
                 if (newQuantityInput.value < 0) {
                     newQuantityInput.value = 0;
                 }
             });
+            //.addEventListener('click', updateRecipe);
                 
         }
         
