@@ -149,7 +149,7 @@
         });
 
         function getItemsWithUnits() {
-            console.log('fetching items with units');
+            //console.log('fetching items with units');
             return fetch('http://localhost:1337/api-v2/getAllItems')
                 .then(response => {
                     if (!response.ok) {
@@ -170,7 +170,7 @@
         function populateAddItemDropdown() {
             getItemsWithUnits()
                 .then(itemsWithUnits => {
-                    console.log('Items with units:', itemsWithUnits);
+                    //console.log('Items with units:', itemsWithUnits);
                 
                     const dropdowns = document.querySelectorAll('.ingredientDropdown'); // Select all elements with class ingredientDropdown
 
@@ -254,12 +254,12 @@
 
             ingredientDropdown.addEventListener('change', () => {
                 const selectedOption = ingredientDropdown.options[ingredientDropdown.selectedIndex];
-                console.log('Selected option:', selectedOption);
+                //console.log('Selected option:', selectedOption);
                 const unitID = Number(selectedOption.getAttribute('data-unit-id'));
-                console.log('Selected unit ID:', unitID);
-                console.log('units.units:', units.units);
+                //console.log('Selected unit ID:', unitID);
+                //console.log('units.units:', units.units);
                 const unitType = units.units.find(unit => unit.id === unitID)?.unitType ?? '';
-                console.log('Selected unit type:', unitType);
+                //console.log('Selected unit type:', unitType);
 
                 unitDropdown.innerHTML = '<option value="">Select Units</option>'; // Reset options
                 const filteredUnits = units.units.filter(unit => unit.unitType === unitType);
@@ -275,7 +275,7 @@
         
 
         function getAllUnits() {
-            console.log('fetching all units');
+            //console.log('fetching all units');
             return fetch('http://localhost:1337/api/getAllUnits')
                 .then(response => {
                     if (!response.ok) {
@@ -294,8 +294,8 @@
 
         Promise.all([getItemsWithUnits(), getAllUnits()])
         .then(([itemsWithUnits, units]) => {
-            console.log('Items with units:', itemsWithUnits);
-            console.log('Units:', units);
+            //console.log('Items with units:', itemsWithUnits);
+            //console.log('Units:', units);
             populateRow(itemsWithUnits, units);
 
             document.getElementById('addRowButton').addEventListener('click', () => {
@@ -390,7 +390,7 @@
     <script>
         
         function getAllUnits() {
-            console.log('fetching all units');
+            //console.log('fetching all units');
             return fetch('http://localhost:1337/api/getAllUnits')
                 .then(response => {
                     if (!response.ok) {
@@ -408,7 +408,7 @@
         }
 
         function getUnitsByType() {
-            console.log('fetching units');
+            //console.log('fetching units');
             return fetch('http://localhost:1337/api/getUnitsByType')
                 .then(response => {
                     if (!response.ok) {
@@ -593,7 +593,7 @@
         function addIngredient() {
             getAllUnits()
                 .then(units => {
-                    console.log('Units:', units);
+                    //console.log('Units:', units);
                     const ingredientsList = document.getElementById('ingredients-list');
 
                     const ingredientDiv = document.createElement('div');
@@ -783,11 +783,11 @@
         function loadRecipeData() {
             getAllUnits()
                 .then(units => {
-                    console.log('Units:', units);
+                    //console.log('Units:', units);
                     return getUnitsByType().then(unitsByType => ({ units, unitsByType }));
                 })
                 .then(({ units, unitsByType}) => {
-                    console.log('Units by type:', unitsByType);
+                    //console.log('Units by type:', unitsByType);
                     
                 
                     const chosenRecipeName = document.getElementById('chooseRecipeUpdate').value;
@@ -810,7 +810,7 @@
                             //console.log('Unit type:', unitType);
                             
                             const validUnits = units?.units?.filter(unit => unit.unitType === unitType).map(unit => ({id: unit.id, name: unit.unitName})) ?? [];
-                            console.log('Valid units:', validUnits);
+                            //console.log('Valid units:', validUnits);
                             const ingredientDiv = document.createElement('div');
                             ingredientDiv.className = 'ingredient-entry';
                             ingredientDiv.innerHTML = `

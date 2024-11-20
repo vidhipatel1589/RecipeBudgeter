@@ -234,6 +234,32 @@ app.post('/api/deleteRecipe', (req, res) => {
   })
 })
 
+//Delete Recipe with DELETE Rest request
+app.delete('/api-v2/deleteRecipe', (req, res) => {
+    const { recipeID, userID } = req.body;
+    const query1 = `SELECT userID FROM recipe WHERE recipeID = ?`;
+    connection.query(query1, [recipeID], (err, results) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({ message: 'Failed to delete recipe' });
+        } else if (results.length === 0) {
+            res.status(204).json({ message: 'Recipe not found' });
+        } else if (results[0].userID !== userID) {
+            res.status(403).json({ message: 'Unauthorized to delete recipe' });
+        } else {
+            const query2 = `DELETE FROM recipe WHERE recipeID = ?`;
+            connection.query(query2, [recipeID], (err, results) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500).json({ message: 'Failed to delete recipe' });
+                } else {
+                    res.status(200).json({ message: 'Recipe deleted successfully' });
+                }
+            });
+        }
+    });
+})
+
 // Add Item to Recipe
 app.post('/api/addRecipeItem', (req, res) => {
     const { recipeID, itemID, quantity, unitID } = req.body
@@ -405,6 +431,20 @@ app.get('/api/getUnitsByType', (req, res) => {
         }
     })
 })
+
+app.get('/api-v2/user/recipes', (req, res) => {
+    const query = `SELECT recipeID, recipeName FROM recipe WHERE userID = ?`;
+    const userID = Number(req.query.userID);
+    connection.query(query, [userID], (err, results) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({ message: 'Failed to get user recipes' });
+        } else {
+            res.status(200).json(results);
+        }
+    });
+})
+
 app.listen(1337, () => {
     console.log('Server started on 1337')
 })
