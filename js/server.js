@@ -353,6 +353,29 @@ app.get('/api/getAllConversions', (req, res) => {
     });
 });
 
+//Get All Units
+app.get('/api/getAllUnits', (req, res) => {
+    const query = `SELECT * FROM unit`
+    connection.query(query, (err, results) => {
+        if (err) {
+            console.error(err)
+            res.status(500).json({ message: 'Failed to get units' })
+        }
+        else {
+            const unitsByType = results.reduce ((acc, unit) => {
+                const { unitType, unitName } = unit;
+                if (!acc[unitType]) {
+                    acc[unitType] = []
+                }
+                acc[unitType].push(unitName)
+                return acc
+            }, {})
+            res.status(200).json({
+                units: unitsByType 
+            })
+        }
+    })
+})
 app.listen(1337, () => {
     console.log('Server started on 1337')
 })
