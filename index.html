@@ -301,6 +301,10 @@
             document.getElementById('addRowButton').addEventListener('click', () => {
                 populateRow(itemsWithUnits, units);
             });
+
+            document.getElementById('update-add-ingredient-button').addEventListener('click', () => {
+                addUpdateRow(itemsWithUnits, units);
+            });
         })
         .catch(error => {
             console.error('Failed to fetch items with units:', error);
@@ -330,11 +334,11 @@
             <div class="description-box">
                 <textarea id="recipe-description" placeholder="Recipe Description" required></textarea>
             </div>  
-            <div class="ingredients-list" id="update-ingredient-list">
+            <div class="update-ingredients-list" id="update-ingredients-list">
                     <!-- Ingredient items will be dynamically added here -->
             </div>
 
-            <button type="button" onclick="addAnotherIngredient()">Add Another Ingredient</button>
+            <button type="button" id="update-add-ingredient-button">Add Another Ingredient</button>
             <button type="button" id="save-recipe-button">Save Recipe</button>
             <button type="button" onclick="deleteRecipe()">Delete Recipe</button>
         </form>
@@ -856,7 +860,7 @@
 
                     document.getElementById('recipe-name').value = recipe[0]?.recipeName;
                     document.querySelector('#updateRecipeForm textarea').value = recipe[0]?.description;
-                    const ingredientsList = document.getElementById('update-ingredient-list');
+                    const ingredientsList = document.getElementById('update-ingredients-list');
                     //clear out previous
                     ingredientsList.innerHTML = '';
                     recipeItems.forEach(item => {
@@ -1002,7 +1006,7 @@
         const recipeForm = document.getElementById('updateRecipeForm');
         const recipeNameInput = document.getElementById('recipe-name');
         const descriptionTextarea = document.getElementById('recipe-description');
-        const ingredientsListDiv = document.getElementById('update-ingredient-list');
+        const ingredientsListDiv = document.getElementById('update-ingredients-list');
         const saveRecipeButton = document.getElementById('save-recipe-button');
 
         saveRecipeButton.addEventListener('click', updateRecipe);
@@ -1057,6 +1061,48 @@
                 console.error('Error updating recipe:', error);
                 alert('Error updating recipe');
             }
+        }
+        const addIngredientButton = document.getElementById('update-add-ingredient-button');
+        addIngredientButton.addEventListener('click', addUpdateRow(itemsWithUnits, units));
+
+        function addUpdateRow(itemsWithUnits, units) {
+            console.log('Adding new row');
+            const ingredientsList = document.getElementById('update-ingredients-list');
+            const ingredientDiv = document.createElement('div');
+            ingredientDiv.className = 'ingredient-entry';
+            ingredientDiv.innerHTML = `
+                <select class = "ingredient-dropdown" required>
+                    <option value="">Select Ingredient</option>
+                    ${itemsWithUnits.map(item => `<option value="${item.itemID}" data-unit-id="${item.unitID}">${item.itemName}</option>`).join('')}
+                </select>
+                <input type="number" class="ingredient-quantity" placeholder="Quantity" required min = "0">
+                <select class="unitDropdown" required>
+                    <option value="">Select Units</option>
+                </select>
+                <button type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
+                `;
+                ingredientsList.appendChild(ingredientDiv);
+                const ingredientDropdown = ingredientDiv.querySelector('.ingredient-dropdown');
+                const unitDropdown = ingredientDiv.querySelector('.unitDropdown');
+
+                ingredientDropdown.addEventListener('change', () => {
+                    const selectedOption = ingredientDropdown.options[ingredientDropdown.selectedIndex];
+                    //console.log('Selected option:', selectedOption);
+                    const unitID = Number(selectedOption.getAttribute('data-unit-id'));
+                    //console.log('Selected unit ID:', unitID);
+                    //console.log('units.units:', units.units);
+                    const unitType = units.units.find(unit => unit.id === unitID)?.unitType ?? '';
+                    //console.log('Selected unit type:', unitType);
+
+                    unitDropdown.innerHTML = '<option value="">Select Units</option>'; // Reset options
+                    const filteredUnits = units.units.filter(unit => unit.unitType === unitType);
+                    filteredUnits.forEach(unit => {
+                        const option = document.createElement('option');
+                        option.value = unit.unitID;
+                        option.textContent = unit.unitName;
+                        unitDropdown.appendChild(option);
+                    });
+                });             
         }
 
         function saveRecipe() {
