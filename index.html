@@ -324,7 +324,7 @@
         <!-- to allow update recipe -->
         <form id="updateRecipeForm" style="display: none;">
             <h1>
-                <input type="text" id="recipeName" required>
+                <input type="text" id="recipe-name" required>
             </h1>
             
             <div class="description-box">
@@ -862,19 +862,39 @@
                     console.log('Recipe items:', recipeItems);
                     console.log('Recipe:', recipe);
 
-                    document.getElementById('recipeName').value = recipe.name;
+                    document.getElementById('recipe-name').value = recipe.name;
                     document.querySelector('#updateRecipeForm textarea').value = recipe.description;
+                    const ingredientsList = document.getElementById('ingredient-list');
+                    //clear out previous
+                    ingredientsList.innerHTML = '';
+                    recipeItems.forEach(item => {
+                        const unitID = item.unitID;
+                        const unitType = units.units.find(unit => unit.id === unitID)?.unitType ?? "";
+                        const validUnits = units.units.filter(unit => unit.unitType === unitType).map(unit => ({id: unit.id, name: unit.unitName}));
+                        const ingredientDiv = document.createElement('div');
+                        ingredientDiv.className = 'ingredient-entry';
+                        ingredientDiv.innerHTML = `
+                            <input type="text" value="${item.itemName}" class="ingredient-name">
+                            <input type="number" value="${item.quantity}" class="ingredient-quantity" min="0">
+                            <select class="ingredient
+                            -unit">
+                                ${validUnits.map(unit => `<option value="${unit.id}">${unit.name}</option>`).join('')}
+                            </select>
+                            <button type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
+                        `;
+                        ingredientsList.appendChild(ingredientDiv);
+                    });
 
-                    if (chosenRecipeID) {
-                        const recipe = recipes[chosenRecipeID];
+
+
+                    if (false) {
+                        //const recipe = recipes[chosenRecipeID];
                         //localStorage.setItem('recipeID', recipe.recipeID);
                         
 
                         
 
-                        //clear out previous
-                        const ingredientsList = document.getElementById('ingredient-list');
-                        ingredientsList.innerHTML = '';
+                        
 
                         //list out the ingredients
                         recipe.ingredients.forEach((ingredient, index) => {
