@@ -470,6 +470,176 @@ app.get('/api-v2/recipe', (req, res) => {
     });
 });
 
+function validateUnits(oldUnits, newUnits) {
+    const query = `SELECT id, unitType FROM unit WHERE unitID IN (?)`;
+    const oldUnitIDs = oldUnits.map(unit => unit.unitID);
+    oldUnitIDs.sort();
+    const newUnitIDs = newUnits.map(unit => unit.unitID);
+    newUnitIDs.sort();
+    const allUnitIDs = [... new Set([...oldUnitIDs, ...newUnitIDs])];
+    if (allUnitIDs.length === 0) {
+        return Promise.resolve(true);
+    }
+
+    return new Promise((resolve, reject) => {
+        connection.query(query, [allUnitIDs], (err, results) => {
+            if(err) {
+                console.error(err);
+                reject('Failed to validate units');
+                return;
+            }
+
+            const unitTypeMap = results.reduce((map, row) => {
+                map[row.unitID] = row.unitType;
+                return map;
+            }, {});
+
+            for (let i = 0; i < oldUnits.length; i++) {
+                const oldUnitID = oldUnits[i].unitID;
+                const newUnitID = newUnits[i].unitID;
+
+                if (unitTypeMap[oldUnitID] !== unitTypeMap[newUnitID]) {
+                    resolve(false);
+                    return;
+                }
+            }
+            resolve(true);
+        });
+    });
+
+}
+
+function recipeItemDiff(oldItems, newItems) {
+    const oldMap = new Map(oldItems.map(item => [item.itemID, item]));
+    const newMap = new Map(newItems.map(item => [item.itemID, item]));
+    const toAdd = [];
+    const toModify = [];
+    const toDelete = [];
+
+    for (const [itemID, oldItem] of oldMap.entries()) {
+        if (!newMap.has(itemID)) {
+            toDelete.push(oldItem);
+        } else {
+            const newItem = newMap.get(itemID);
+            if (JSON.stringify(oldItem) !== JSON.stringify(newItem)) {
+                toModify.push(newItem);
+            }
+        }
+    }
+    for (const [itemID, newItem] of newMap.entries()) {
+        if (!oldMap.has(itemID)) {
+            toAdd.push(newItem);
+        }
+    }
+    return { toAdd, toModify, toDelete };
+}
+
+function buildRecipeItemUpdateQuery(recipeID, items) {
+    const oldItemQuery = `SELECT recipeID, itemID, quantity, unitID FROM recipe_item WHERE recipeID = ?`;
+    return new Promise((resolve, reject) => {
+        connection.query(oldItemQuery, [recipeID], (err, results) => {
+            if (err) {
+                console.error(err);
+                reject('Failed to update recipe items');
+                return;
+            }
+
+            const oldItems = results.map(row => ({
+                recipeID: row.recipeID,
+                itemID: row.itemID,
+                quantity: row.quantity,
+                unitID: row.unitID
+            }));
+            const { toAdd, toModify, toDelete } = recipeItemDiff(oldItems, items);
+            const queries = [];
+            if (toAdd.length > 0) {
+                const values = toAdd.map(
+                    item => `(${recipeID}, ${item.itemID}, ${item.quantity}, ${item.unitID})`
+                ).join(', ');
+                queries.push(`INSERT INTO recipe_item (recipeID, itemID, quantity, unitID) VALUES ${values}`);
+            }
+            if (toModify.length > 0) {
+                toModify.forEach(item => {
+                    queries.push(`
+                        UPDATE recipe_item
+                        SET quantity = ${item.quantity}, unitID = ${item.unitID}
+                        WHERE recipeID = ${recipeID} AND itemID = ${item.itemID}
+                    `);
+                });
+            }
+            if (toDelete.length > 0) {
+                const deleteIDs = toDelete.map(item => item.itemID).join(', ');
+                queries.push(`DELETE FROM recipe_item WHERE recipeID = ${recipeID} AND itemID IN (${deleteIDs})`);
+            }
+            resolve(queries);
+        });
+    });
+}
+
+app.patch('/api-v2/recipe', async (req, res) => {
+    const {recipeName, description, recipeItems, userID} = req.body;
+    const recipeID = Number(req.query.recipeID);
+    const query1 = `SELECT userID FROM recipe WHERE recipeID = ?`;
+    connection.query(query1, [recipeID], (err, results) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({ message: 'Failed to update recipe' });
+            return;
+        } else if (results.length === 0) {
+            res.status(404).json({ message: 'Recipe not found' });
+            return;
+
+        } else if (results[0].userID !== userID) {
+            res.status(403).json({ message: 'Unauthorized to update recipe' });
+            return;
+        } else {
+            const query2 = `UPDATE recipe SET recipeName = ?, description = ? WHERE recipeID = ?`;
+            connection.query(query2, [recipeName, description, recipeID], (err, results) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500).json({ message: 'Failed to update recipe' });
+                    return;
+                }
+                try {
+                    const oldItemsQuery = `SELECT itemID, quantity, unitID FROM recipe_item WHERE recipeID = ?`;
+                    connection.query(oldItemsQuery, [recipeID], async (err, oldItems) => {
+                        if (err) {
+                            console.error(err);
+                            res.status(500).json({ message: 'Failed to update recipe items' });
+                            return;
+                        }
+                    const {toAdd, toModify, toDelete} = recipeItemDiff(oldItems, recipeItems);
+                    const oldUnits = oldItems
+                        .filter(oldItem => toModify.some(modified => modified.itemID === oldItem.itemID))
+                        .map(oldItem => ({unitID: oldItem.unitID}));
+                    const newUnits = toModify.map(item => ({unitID: item.unitID}));
+                    const areUnitsValid = await validateUnits(oldUnits, newUnits);
+                    if (!areUnitsValid) {
+                        res.status(400).json({ message: 'Unit type mismatch' });
+                        return;
+                    }
+                    const updateQueries = await buildRecipeItemUpdateQuery(recipeID, recipeItems);
+                    for (const query of updateQueries) {
+                        connection.query(query, (err, results) => {
+                            if (err) {
+                                console.error(err);
+                                res.status(500).json({ message: 'Failed to update recipe items' });
+                                return;
+                            }
+                        });
+                    }
+                    res.status(200).json({ message: 'Recipe updated successfully' });
+                });
+            } catch (err) {
+                console.error(err);
+                res.status(500).json({ message: 'Failed to update recipe items' });
+            }
+            });
+
+        }
+    });
+});
+
 app.listen(1337, () => {
     console.log('Server started on 1337')
 })
