@@ -325,6 +325,19 @@ app.get('/api/getAllItems', (req, res) => {
     });
 });
 
+// Get All Items
+app.get('/api-v2/getAllItems', (req, res) => {
+    const query = `SELECT itemID, itemName, unitID FROM inventory`;
+    connection.query(query, (err, results) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({ message: 'Failed to get items' });
+        } else {
+            res.status(200).json(results);
+        }
+    });
+});
+
 // Get All Unit Conversions
 app.get('/api/getAllConversions', (req, res) => {
     const query = `

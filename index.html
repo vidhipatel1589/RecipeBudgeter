@@ -126,16 +126,7 @@
                 <textarea placeholder="Recipe Description" required></textarea>
             </div>    
             <div class="ingredients-list" id="ingredients-list">
-                <div class="ingredient">
-                    <select class="ingredientDropdown" required>
-                        <option value="">Select Ingredient</option>
-                    </select>
-                    <input type="number" placeholder="Quantity" required min="0" class="initialQuantity">
-                    <select class="unitDropdown" required>
-                        <option value="">Select Units</option>
-                    </select>
-                    <button type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
-                </div>                
+                 
             </div>
 
             <button type="button" onclick="addIngredient()">Add Another Ingredient</button>
@@ -157,22 +148,52 @@
             });
         });
 
+        function getItemsWithUnits() {
+            console.log('fetching items with units');
+            return fetch('http://localhost:1337/api-v2/getAllItems')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('HTTP Error: ' + response.status);
+                    }
+                    return response.json(); // Return the parsed JSON data
+                })
+                .then(data => {
+                    return data; // Return the data to the caller
+                })
+                .catch(error => {
+                    console.error('Error fetching items with units:', error);
+                    throw error; // Re-throw the error to be handled upstream
+                });
+        }
+
         // Populate all ingredient dropdowns
         function populateAddItemDropdown() {
-            const items = JSON.parse(localStorage.getItem('items')) || {};
-            const dropdowns = document.querySelectorAll('.ingredientDropdown'); // Select all elements with class ingredientDropdown
+            getItemsWithUnits()
+                .then(itemsWithUnits => {
+                    console.log('Items with units:', itemsWithUnits);
+                
+                    const dropdowns = document.querySelectorAll('.ingredientDropdown'); // Select all elements with class ingredientDropdown
 
-            dropdowns.forEach(dropdown => {
-                dropdown.innerHTML = '<option value="">Select Ingredient</option>'; // Reset options
+                    dropdowns.forEach(dropdown => {
+                        dropdown.innerHTML = '<option value="">Select Ingredient</option>'; // Reset options
 
-                for (const [name, id] of Object.entries(items)) {
-                    const option = document.createElement('option');
-                    option.value = id; // Set value as the item's ID
-                    option.textContent = name; // Set text as the item's name
-                    dropdown.appendChild(option);
-                }
-            });
+                        for (item of itemsWithUnits) {
+                            const option = document.createElement('option');
+                            option.value = item.itemID; // Set value as the item's ID
+                            option.textContent = item.itemName; // Set text as the item's name
+                            option.setAttribute('data-unit-type', item.unitType); // Set data attribute for unit type
+                            dropdown.appendChild(option);
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Failed to fetch items with units:', error);
+                });
+        
+            
         }
+
+        
 
         // Populate all unit dropdowns
         function populateAddUnitDropdown() {
@@ -208,9 +229,80 @@
             });
         }
 
+        function populateRow(itemsWithUnits, units) {
+            const ingredientsList = document.getElementById('ingredients-list');
+
+            const ingredientDiv = document.createElement('div');
+            ingredientDiv.className = 'ingredient';
+
+            // Create the new ingredient row
+            ingredientDiv.innerHTML = `
+                <select class="ingredientDropdown" required>
+                    <option value="">Select Ingredient</option>
+                    ${itemsWithUnits.map(item => `<option value="${item.itemID}" data-unit-id="${item.unitID}">${item.itemName}</option>`).join('')}
+                </select>
+                <input type="number" placeholder="Quantity" required min="0" class="initialQuantity">
+                <select class="unitDropdown" required>
+                    <option value="">Select Units</option>
+                </select>
+                <button type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
+            `;
+            ingredientsList.appendChild(ingredientDiv);
+
+            const ingredientDropdown = ingredientDiv.querySelector('.ingredientDropdown');
+            const unitDropdown = ingredientDiv.querySelector('.unitDropdown');
+
+            ingredientDropdown.addEventListener('change', () => {
+                const selectedOption = ingredientDropdown.options[ingredientDropdown.selectedIndex];
+                console.log('Selected option:', selectedOption);
+                const unitID = Number(selectedOption.getAttribute('data-unit-id'));
+                console.log('Selected unit ID:', unitID);
+                console.log('units.units:', units.units);
+                const unitType = units.units.find(unit => unit.id === unitID)?.unitType ?? '';
+                console.log('Selected unit type:', unitType);
+
+                unitDropdown.innerHTML = '<option value="">Select Units</option>'; // Reset options
+                const filteredUnits = units.units.filter(unit => unit.unitType === unitType);
+                filteredUnits.forEach(unit => {
+                    const option = document.createElement('option');
+                    option.value = unit.unitID;
+                    option.textContent = unit.unitName;
+                    unitDropdown.appendChild(option);
+                });
+            });
+        }
+
+        function getAllUnits() {
+            console.log('fetching all units');
+            return fetch('http://localhost:1337/api/getAllUnits')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('HTTP Error: ' + response.status);
+                    }
+                    return response.json(); // Return the parsed JSON data
+                })
+                .then(data => {
+                    return data; // Return the data to the caller
+                })
+                .catch(error => {
+                    console.error('Error fetching units:', error);
+                    throw error; // Re-throw the error to be handled upstream
+                });
+        }
+
+        Promise.all([getItemsWithUnits(), getAllUnits()])
+        .then(([itemsWithUnits, units]) => {
+            console.log('Items with units:', itemsWithUnits);
+            console.log('Units:', units);
+            populateRow(itemsWithUnits, units);
+        })
+        .catch(error => {
+            console.error('Failed to fetch items with units:', error);
+        });
+
         // Initial population of dropdowns
-        populateAddItemDropdown();
-        populateAddUnitDropdown();
+        // populateAddItemDropdown();
+        // populateAddUnitDropdown();
     </script>
 
     <!------------------------------------------------------------------------------------------->
@@ -485,40 +577,56 @@
             document.getElementById('dropdownContent').style.display = 'none';
         }
 
+        // function updateUnitDropdown(ingredientDropdown, unitDropdown) {
+        //     const selectedIngredient = ingredientDropdown.value;
+        //     console.log('Selected ingredient:', selectedIngredient);
+        //     unitDropdown.innerHTML = '<option value="">Select Units</option>'; // Reset options
+        //     const 
+        // }
+
         function addIngredient() {
-            const ingredientsList = document.getElementById('ingredients-list');
+            getAllUnits()
+                .then(units => {
+                    console.log('Units:', units);
+                    const ingredientsList = document.getElementById('ingredients-list');
 
-            const ingredientDiv = document.createElement('div');
-            ingredientDiv.className = 'ingredient';
+                    const ingredientDiv = document.createElement('div');
+                    ingredientDiv.className = 'ingredient';
 
-            // Create the new ingredient row
-            ingredientDiv.innerHTML = `
-                <select class="ingredientDropdown" required>
-                    <option value="">Select Ingredient</option>
-                </select>
-                <input type="number" placeholder="Quantity" required min="0" class="initialQuantity">
-                <select class="unitDropdown" required>
-                    <option value="">Select Units</option>
-                </select>
-                <button type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
-            `;
+                    // Create the new ingredient row
+                    ingredientDiv.innerHTML = `
+                        <select class="ingredientDropdown" required>
+                            <option value="">Select Ingredient</option>
+                        </select>
+                        <input type="number" placeholder="Quantity" required min="0" class="initialQuantity">
+                        <select class="unitDropdown" required>
+                            <option value="">Select Units</option>
+                        </select>
+                        <button type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
+                    `;
 
-            ingredientsList.appendChild(ingredientDiv);
+                    ingredientsList.appendChild(ingredientDiv);
 
-            // Populate the new dropdowns
-            const newIngredientDropdown = ingredientDiv.querySelector('.ingredientDropdown');
-            const newUnitDropdown = ingredientDiv.querySelector('.unitDropdown');
+                    // Populate the new dropdowns
+                    const newIngredientDropdown = ingredientDiv.querySelector('.ingredientDropdown');
+                    const newUnitDropdown = ingredientDiv.querySelector('.unitDropdown');
 
-            populateAddNewDropdown(newIngredientDropdown, 'items'); // Populate items dropdown
-            populateAddNewDropdown(newUnitDropdown, 'conversions'); // Populate units dropdown
+                    populateAddNewDropdown(newIngredientDropdown, 'items'); // Populate items dropdown
+                    populateAddNewDropdown(newUnitDropdown, 'conversions'); // Populate units dropdown
 
-            // Prevent negative values in the new quantity field
-            const newQuantityInput = ingredientDiv.querySelector('.initialQuantity');
-            newQuantityInput.addEventListener('input', () => {
-                if (newQuantityInput.value < 0) {
-                    newQuantityInput.value = 0; // Reset to 0 if negative
-                }
-            });
+                    // Prevent negative values in the new quantity field
+                    const newQuantityInput = ingredientDiv.querySelector('.initialQuantity');
+                    newQuantityInput.addEventListener('input', () => {
+                        if (newQuantityInput.value < 0) {
+                            newQuantityInput.value = 0; // Reset to 0 if negative
+                        }
+                    });
+                })
+
+                .catch(error => {
+                    console.error('Failed to fetch units:', error);
+                });
+            
         }
 
         function deleteIngredient(button) {
