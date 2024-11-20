@@ -168,16 +168,16 @@
 
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
-            const quantityInputs = document.querySelectorAll('.initialQuantity');
-            quantityInputs.forEach(input => {
-                input.addEventListener('input', () => {
-                    if (input.value < 0) {
-                        input.value = 0;
-                    }
-                });
-            });
-        });
+        // document.addEventListener("DOMContentLoaded", () => {
+        //     const quantityInputs = document.querySelectorAll('.initialQuantity');
+        //     quantityInputs.forEach(input => {
+        //         input.addEventListener('input', () => {
+        //             if (input.value < 0) {
+        //                 input.value = 0;
+        //             }
+        //         });
+        //     });
+        // });
 
         function getItemsWithUnits() {
             //console.log('fetching items with units');
@@ -299,6 +299,15 @@
                     unitDropdown.appendChild(option);
                 });
             });
+
+            const newQuantityInput = ingredientDiv.querySelector('.initialQuantity');
+            newQuantityInput.addEventListener('input', () => {
+                if (newQuantityInput.value < 0) {
+                    newQuantityInput.value = 0;
+                }
+            });
+
+
         }
 
         
@@ -614,12 +623,12 @@
                     populateAddNewDropdown(newIngredientDropdown, 'items');
                     populateAddNewDropdown(newUnitDropdown, 'conversions');
 
-                            const newQuantityInput = ingredientDiv.querySelector('.initialQuantity');
-                    newQuantityInput.addEventListener('input', () => {
-                        if (newQuantityInput.value < 0) {
-                            newQuantityInput.value = 0;
-                        }
-                    });
+                            // const newQuantityInput = ingredientDiv.querySelector('.initialQuantity');
+                    // newQuantityInput.addEventListener('input', () => {
+                    //     if (newQuantityInput.value < 0) {
+                    //         newQuantityInput.value = 0;
+                    //     }
+                    // });
                 })
 
                 .catch(error => {
@@ -1091,28 +1100,36 @@
                 </select>
                 <button type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
                 `;
-                ingredientsList.appendChild(ingredientDiv);
-                const ingredientDropdown = ingredientDiv.querySelector('.ingredient-dropdown');
-                const unitDropdown = ingredientDiv.querySelector('.unitDropdown');
+            ingredientsList.appendChild(ingredientDiv);
+            const ingredientDropdown = ingredientDiv.querySelector('.ingredient-dropdown');
+            const unitDropdown = ingredientDiv.querySelector('.unitDropdown');
 
-                ingredientDropdown.addEventListener('change', () => {
-                    const selectedOption = ingredientDropdown.options[ingredientDropdown.selectedIndex];
-                    //console.log('Selected option:', selectedOption);
-                    const unitID = Number(selectedOption.getAttribute('data-unit-id'));
-                    //console.log('Selected unit ID:', unitID);
-                    //console.log('units.units:', units.units);
-                    const unitType = units.units.find(unit => unit.id === unitID)?.unitType ?? '';
-                    //console.log('Selected unit type:', unitType);
+            ingredientDropdown.addEventListener('change', () => {
+                const selectedOption = ingredientDropdown.options[ingredientDropdown.selectedIndex];
+                //console.log('Selected option:', selectedOption);
+                const unitID = Number(selectedOption.getAttribute('data-unit-id'));
+                //console.log('Selected unit ID:', unitID);
+                //console.log('units.units:', units.units);
+                const unitType = units.units.find(unit => unit.id === unitID)?.unitType ?? '';
+                //console.log('Selected unit type:', unitType);
 
-                    unitDropdown.innerHTML = '<option value="">Select Units</option>'; // Reset options
-                    const filteredUnits = units.units.filter(unit => unit.unitType === unitType);
-                    filteredUnits.forEach(unit => {
-                        const option = document.createElement('option');
-                        option.value = unit.unitID;
-                        option.textContent = unit.unitName;
-                        unitDropdown.appendChild(option);
-                    });
-                });             
+                unitDropdown.innerHTML = '<option value="">Select Units</option>'; // Reset options
+                const filteredUnits = units.units.filter(unit => unit.unitType === unitType);
+                filteredUnits.forEach(unit => {
+                    const option = document.createElement('option');
+                    option.value = unit.unitID;
+                    option.textContent = unit.unitName;
+                    unitDropdown.appendChild(option);
+                });
+            });
+
+            const newQuantityInput = ingredientDiv.querySelector('.ingredient-quantity');
+            newQuantityInput.addEventListener('input', () => {
+                if (newQuantityInput.value < 0) {
+                    newQuantityInput.value = 0;
+                }
+            });
+                
         }
         
         ////////////////////////////////////////////////////////////////////////////////////////
