@@ -116,7 +116,6 @@ app.post('/api/userRecipe', (req, res) => {
             return res.status(500).json({ message: 'Failed to fetch recipes' });
         }
     
-        // If no recipes found, return an empty array
         if (recipes.length === 0) {
             return res.status(200).json([]);
         }
@@ -208,7 +207,7 @@ app.post('/api/addRecipe', (req, res) => {
 
 // Update Recipe
 app.post('/api/updateRecipe', (req, res) => {
-    const { recipeID } = req.body
+    const { recipeID, recipeName, description, ingredients } = req.body
     const query = `UPDATE recipe SET recipeName = ?, description = ? WHERE recipeID = ?`
     connection.query(query, [recipeName, description, recipeID], (err, results) => {
         if (err) {
@@ -220,18 +219,45 @@ app.post('/api/updateRecipe', (req, res) => {
     })
 })
 
+
 // Delete Recipe
 app.post('/api/deleteRecipe', (req, res) => {
-  const { recipeID } = req.body
-  const query = `DELETE FROM recipe WHERE recipeID = ?`
-  connection.query(query, [recipeID], (err, results) => {
-      if (err) {
-      console.error(err)
-      res.status(500).json({ message: 'Failed to delete recipe' })
-      } else {
-      res.status(200).json({ message: 'Recipe deleted successfully' })
-      }
+    const { recipeID } = req.body
+    const query = `DELETE FROM recipe WHERE recipeID = ?`
+    connection.query(query, [recipeID], (err, results) => {
+        if (err) {
+        console.error(err)
+        res.status(500).json({ message: 'Failed to delete recipe' })
+        } else {
+        res.status(200).json({ message: 'Recipe deleted successfully' })
+        }
+    })
   })
+
+// Delete User Specific Recipe
+app.post('/api/deleteUserRecipe', (req, res) => {
+    const { recipeID, userID } = req.body;
+    const query1 = `SELECT userID FROM recipe WHERE recipeID = ?`;
+    connection.query(query1, [recipeID], (err, results) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({ message: 'Failed to delete recipe' });
+        } else if (results.length === 0) {
+            res.status(204).json({ message: 'Recipe not found' });
+        } else if (parseInt(results[0].userID) !== parseInt(userID)) {
+            res.status(403).json({ message: 'Unauthorized to delete recipe' });
+        } else {
+            const query2 = `DELETE FROM recipe WHERE recipeID = ?`;
+            connection.query(query2, [recipeID], (err, results) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500).json({ message: 'Failed to delete recipe' });
+                } else {
+                    res.status(200).json({ message: 'Recipe deleted successfully' });
+                }
+            });
+        }
+    });
 })
 
 // Add Item to Recipe
@@ -352,6 +378,44 @@ app.get('/api/getAllConversions', (req, res) => {
         }
     });
 });
+
+app.post('/api/badLogin', (req, res) => {
+    const { username, password } = req.body;
+    const query = 'SELECT * FROM users WHERE username = \'' + username +  '\' AND password = \'' + password + '\'';
+    console.log(query)
+    connection.query(query, [], (err, results) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({ message: 'Failed to login' });
+        } else if (results.length === 0) {
+            res.status(401).json({ message: 'Invalid credentials' });
+        } else {
+            const user = results[0];
+            res.send({ 
+                message: 'Login successful', 
+                userID: user.userID 
+            });
+        }
+    })
+})
+
+app.post('/api/badResetPassword', (req, res) => {
+    const { username, oldPassword, newPassword } = req.body
+    const query = 'UPDATE users SET password = \"' + newPassword + '\" WHERE username = \"' + username + '\" AND password = \"' + oldPassword + '\"'
+    console.log(query)
+    connection.query(query, [], (err, results) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({ message: 'Failed to update password' });
+        } else {
+            if (results.affectedRows > 0) {
+                res.status(200).json({ message: 'Password updated successfully' });
+            } else {
+                res.status(400).json({ message: 'Invalid username or password' });
+            }
+        }
+    })
+})
 
 app.listen(1337, () => {
     console.log('Server started on 1337')

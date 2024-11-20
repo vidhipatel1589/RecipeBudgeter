@@ -364,9 +364,17 @@ h4 {
 h5 {
     font-size: 20px;
     font-weight: bold;
-    color: #333;
-    position: fixed;
-    left: 55%;
+    color: white;
+    position: sticky;
+    bottom: 0;
+    padding: 10px 20px;
+    margin: 0;
+    text-align: right;
+    display: inline-block;
+    background-color: #DA8359;
+    border-radius: 8px;
+    margin-left: auto;
+    margin-right: 20px;
 }
 
 #recipeCostDetails h4 {
