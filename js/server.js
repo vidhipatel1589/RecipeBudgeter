@@ -362,12 +362,28 @@ app.get('/api/getAllUnits', (req, res) => {
             res.status(500).json({ message: 'Failed to get units' })
         }
         else {
+            res.status(200).json({
+                units: results
+            })
+        }
+    })
+})
+
+// Get Units by Type
+app.get('/api/getUnitsByType', (req, res) => {
+    const query = `SELECT * FROM unit`
+    connection.query(query, (err, results) => {
+        if (err) {
+            console.error(err)
+            res.status(500).json({ message: 'Failed to get units' })
+        }
+        else {
             const unitsByType = results.reduce ((acc, unit) => {
-                const { unitType, unitName } = unit;
+                const { id, unitType, unitName } = unit;
                 if (!acc[unitType]) {
                     acc[unitType] = []
                 }
-                acc[unitType].push(unitName)
+                acc[unitType].push({id, unitName})
                 return acc
             }, {})
             res.status(200).json({

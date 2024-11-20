@@ -15,6 +15,7 @@ function convertRecipes() {
                 quantity: ingredient.quantity,
                 unit: ingredient.RecipeUnit,
                 unitID: ingredient.RecipeUnitID, 
+                unitType: ingredient.unitType,
                 price: ingredient.price || 0,
                 available: parseInt(ingredient.stock, 10) > 0
             })),

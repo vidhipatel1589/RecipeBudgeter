@@ -290,10 +290,51 @@
     <script src="js/home.js"></script>
     <script src="js/updateRecipe.js"></script>
     <script>
-
-        function getUnits() {
-            
+        
+        function getAllUnits() {
+            console.log('fetching all units');
+            return fetch('http://localhost:1337/api/getAllUnits')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('HTTP Error: ' + response.status);
+                    }
+                    return response.json(); // Return the parsed JSON data
+                })
+                .then(data => {
+                    return data; // Return the data to the caller
+                })
+                .catch(error => {
+                    console.error('Error fetching units:', error);
+                    throw error; // Re-throw the error to be handled upstream
+                });
         }
+
+        function getUnitsByType() {
+            console.log('fetching units');
+            return fetch('http://localhost:1337/api/getUnitsByType')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('HTTP Error: ' + response.status);
+                    }
+                    return response.json(); // Return the parsed JSON data
+                })
+                .then(data => {
+                    return data; // Return the data to the caller
+                })
+                .catch(error => {
+                    console.error('Error fetching units:', error);
+                    throw error; // Re-throw the error to be handled upstream
+                });
+        }
+
+        function getUnitsOfType(units, type) {
+            if (!units || !type) {
+                console.error(`Type "${type}" does not exists in the units object`);
+                return [];
+            }
+            return units.units.filter
+        }
+    
 
         function showLogin() {
             document.getElementById('signupWrapper').style.display = 'none';
@@ -626,46 +667,68 @@
 
         //get list of recipes to choose from
         function loadRecipeData() {
-            const chosenRecipeName = document.getElementById('chooseRecipeUpdate').value;
-            if (chosenRecipeName) {
-                const recipe = recipes[chosenRecipeName];
-                localStorage.setItem('recipeID', recipe.recipeID);
-                document.getElementById('recipeName').value = recipe.name;
+            getAllUnits()
+                .then(units => {
+                    console.log('Units:', units);
+                    return getUnitsByType().then(unitsByType => ({ units, unitsByType }));
+                })
+                .then(({ units, unitsByType}) => {
+                    console.log('Units by type:', unitsByType);
+                    
+                
+                    const chosenRecipeName = document.getElementById('chooseRecipeUpdate').value;
+                    if (chosenRecipeName) {
+                        const recipe = recipes[chosenRecipeName];
+                        localStorage.setItem('recipeID', recipe.recipeID);
+                        document.getElementById('recipeName').value = recipe.name;
 
-                document.querySelector('#updateRecipeForm textarea').value = recipe.description;
+                        document.querySelector('#updateRecipeForm textarea').value = recipe.description;
 
-                //clear out previous
-                const ingredientsList = document.getElementById('ingredient-list');
-                ingredientsList.innerHTML = '';
+                        //clear out previous
+                        const ingredientsList = document.getElementById('ingredient-list');
+                        ingredientsList.innerHTML = '';
 
-                //list out the ingredients
-                recipe.ingredients.forEach((ingredient, index) => {
-                    const ingredientDiv = document.createElement('div');
-                    ingredientDiv.className = 'ingredient-entry';
-                    ingredientDiv.innerHTML = `
-                                        <input type="text" value="${ingredient.ingredient}" class="ingredient-name">
-                                        <input type="number" value="${ingredient.quantity}" class="ingredient-quantity" min = "0">
-                                        <input type="text" value="${ingredient.unit}" class="ingredient-unit">
-                                        <button type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
-                                    `;
-                    ingredientsList.appendChild(ingredientDiv);
-                });
+                        //list out the ingredients
+                        recipe.ingredients.forEach((ingredient, index) => {
+                            const unitID = ingredient.unitID;
+                            //console.log('Unit ID:', unitID);
+                            const unitType = units?.units.find(unit => unit.id === unitID)?.unitType ?? "";
+                            //console.log('Unit type:', unitType);
+                            
+                            const validUnits = units?.units?.filter(unit => unit.unitType === unitType).map(unit => ({id: unit.id, name: unit.unitName})) ?? [];
+                            console.log('Valid units:', validUnits);
+                            const ingredientDiv = document.createElement('div');
+                            ingredientDiv.className = 'ingredient-entry';
+                            ingredientDiv.innerHTML = `
+                                                <input type="text" value="${ingredient.ingredient}" class="ingredient-name">
+                                                <input type="number" value="${ingredient.quantity}" class="ingredient-quantity" min = "0">
+                                                <select class="ingredient-unit">
+                                                    ${validUnits.map(unit => `<option value="${unit.id}">${unit.name}</option>`).join('')}
+                                                </select>
+                                                <button type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
+                                            `;
+                            ingredientsList.appendChild(ingredientDiv);
+                        });
 
-                //Prevent users from manually entering a negative number
-                document.querySelectorAll('.ingredient-quantity').forEach(input => {
-                input.addEventListener('input', () => {
-                    if (input.value < 0) {
-                        input.value = 0; // Reset to 0 if negative number is entered
+                        //Prevent users from manually entering a negative number
+                        document.querySelectorAll('.ingredient-quantity').forEach(input => {
+                        input.addEventListener('input', () => {
+                            if (input.value < 0) {
+                                input.value = 0; // Reset to 0 if negative number is entered
+                            }
+                            });
+                        });
+
+                        //show form to update recipe
+                        document.getElementById('updateRecipeForm').style.display = 'block';
+                    } else {
+                        //clear if no recipe chosen
+                        document.getElementById('updateRecipeForm').style.display = 'none';
                     }
-                    });
+                })
+                .catch(error => {
+                    console.error('Failed to fetch units:', error);
                 });
-
-                //show form to update recipe
-                document.getElementById('updateRecipeForm').style.display = 'block';
-            } else {
-                //clear if no recipe chosen
-                document.getElementById('updateRecipeForm').style.display = 'none';
-            }
         }
 
         //add another ingredient to recipe
