@@ -328,23 +328,14 @@
             </h1>
             
             <div class="description-box">
-                <textarea placeholder="Recipe Description" required></textarea>
+                <textarea id="recipe-description" placeholder="Recipe Description" required></textarea>
             </div>  
             <div class="ingredients-list" id="update-ingredient-list">
-                <div class="ingredient">
-                    <input type="number" placeholder="Quantity" required min = "0">
-                    <select>
-                        <option value="Units">Units</option>
-                        <option value="Cups">Cups</option>
-                        <option value="Pounds">Pounds</option>
-                        <option value="Ounces">Ounces</option>
-                    </select>
-                    <button  type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
-                </div>
+                    <!-- Ingredient items will be dynamically added here -->
             </div>
 
             <button type="button" onclick="addAnotherIngredient()">Add Another Ingredient</button>
-            <button type="button" onclick="updateRecipe()">Save Recipe</button>
+            <button type="button" id="save-recipe-button">Save Recipe</button>
             <button type="button" onclick="deleteRecipe()">Delete Recipe</button>
         </form>
     </div>
@@ -780,6 +771,7 @@
                     alert('Error fetching recipes');
                 });
         }
+
         ////////////////////////////////////////////////////////////////////////////////////////
 
         //dropdown for recipes
@@ -859,8 +851,8 @@
             Promise.all([getAllUnits(), getRecipeItems(chosenRecipeID), getRecipe(chosenRecipeID), getItemsWithUnits()])
                 .then(([ units, recipeItems, recipe, itemsWithUnits]) => {
                     //console.log('Units by type:', unitsByType);
-                    console.log('Recipe items:', recipeItems);
-                    console.log('Recipe:', recipe);
+                    // console.log('Recipe items:', recipeItems);
+                    // console.log('Recipe:', recipe);
 
                     document.getElementById('recipe-name').value = recipe[0]?.recipeName;
                     document.querySelector('#updateRecipeForm textarea').value = recipe[0]?.description;
@@ -869,13 +861,13 @@
                     ingredientsList.innerHTML = '';
                     recipeItems.forEach(item => {
                         const itemID = item.itemID;
-                        console.log('Item:', item);
+                        // console.log('Item:', item);
                         const unitID = item.unitID;
-                        console.log('Unit ID:', unitID);
+                        // console.log('Unit ID:', unitID);
                         const unitType = units.units.find(unit => unit.id === unitID)?.unitType ?? "";
-                        console.log('Unit type:', unitType);
+                        // console.log('Unit type:', unitType);
                         const validUnits = units.units.filter(unit => unit.unitType === unitType).map(unit => ({id: unit.id, name: unit.unitName}));
-                        console.log('Valid units:', validUnits);
+                        // console.log('Valid units:', validUnits);
                         const ingredientDiv = document.createElement('div');
                         ingredientDiv.className = 'ingredient-entry';
                         ingredientDiv.innerHTML = `
@@ -897,12 +889,12 @@
                         const unitDropdown = ingredientDiv.querySelector('.ingredient-unit');
                         ingredientDropdown.addEventListener('change', () => {
                             const selectedOption = ingredientDropdown.options[ingredientDropdown.selectedIndex];
-                            console.log('Selected option:', selectedOption);
-                            console.log('data-unit-id:', selectedOption.getAttribute('data-unit-id'));
+                            // console.log('Selected option:', selectedOption);
+                            // console.log('data-unit-id:', selectedOption.getAttribute('data-unit-id'));
                             const unitID2 = Number(selectedOption.getAttribute('data-unit-id'));
-                            console.log('Selected unit ID:', unitID2);
+                            // console.log('Selected unit ID:', unitID2);
                             const unitType = units.units.find(unit => unit.id === unitID2)?.unitType ?? '';
-                            console.log('Selected unit type:', unitType);
+                            // console.log('Selected unit type:', unitType);
                             unitDropdown.innerHTML = '<option value="">Select Units</option>'; // Reset options
                             const filteredUnits = units.units.filter(unit => unit.unitType === unitType);
                             filteredUnits.forEach(unit => {
@@ -924,52 +916,52 @@
 
 
 
-                    if (false) {
-                        //const recipe = recipes[chosenRecipeID];
-                        //localStorage.setItem('recipeID', recipe.recipeID);
+                    // if (false) {
+                    //     //const recipe = recipes[chosenRecipeID];
+                    //     //localStorage.setItem('recipeID', recipe.recipeID);
                         
 
                         
 
                         
 
-                        //list out the ingredients
-                        recipe.ingredients.forEach((ingredient, index) => {
-                            const unitID = ingredient.unitID;
-                            //console.log('Unit ID:', unitID);
-                            const unitType = units?.units.find(unit => unit.id === unitID)?.unitType ?? "";
-                            //console.log('Unit type:', unitType);
+                    //     //list out the ingredients
+                    //     recipe.ingredients.forEach((ingredient, index) => {
+                    //         const unitID = ingredient.unitID;
+                    //         //console.log('Unit ID:', unitID);
+                    //         const unitType = units?.units.find(unit => unit.id === unitID)?.unitType ?? "";
+                    //         //console.log('Unit type:', unitType);
                             
-                            const validUnits = units?.units?.filter(unit => unit.unitType === unitType).map(unit => ({id: unit.id, name: unit.unitName})) ?? [];
-                            //console.log('Valid units:', validUnits);
-                            const ingredientDiv = document.createElement('div');
-                            ingredientDiv.className = 'ingredient-entry';
-                            ingredientDiv.innerHTML = `
-                                                <input type="text" value="${ingredient.ingredient}" class="ingredient-name">
-                                                <input type="number" value="${ingredient.quantity}" class="ingredient-quantity" min = "0">
-                                                <select class="ingredient-unit">
-                                                    ${validUnits.map(unit => `<option value="${unit.id}">${unit.name}</option>`).join('')}
-                                                </select>
-                                                <button type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
-                                            `;
-                            ingredientsList.appendChild(ingredientDiv);
-                        });
+                    //         const validUnits = units?.units?.filter(unit => unit.unitType === unitType).map(unit => ({id: unit.id, name: unit.unitName})) ?? [];
+                    //         //console.log('Valid units:', validUnits);
+                    //         const ingredientDiv = document.createElement('div');
+                    //         ingredientDiv.className = 'ingredient-entry';
+                    //         ingredientDiv.innerHTML = `
+                    //                             <input type="text" value="${ingredient.ingredient}" class="ingredient-name">
+                    //                             <input type="number" value="${ingredient.quantity}" class="ingredient-quantity" min = "0">
+                    //                             <select class="ingredient-unit">
+                    //                                 ${validUnits.map(unit => `<option value="${unit.id}">${unit.name}</option>`).join('')}
+                    //                             </select>
+                    //                             <button type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
+                    //                         `;
+                    //         ingredientsList.appendChild(ingredientDiv);
+                    //     });
 
-                        //Prevent users from manually entering a negative number
-                        document.querySelectorAll('.ingredient-quantity').forEach(input => {
-                        input.addEventListener('input', () => {
-                            if (input.value < 0) {
-                                input.value = 0; // Reset to 0 if negative number is entered
-                            }
-                            });
-                        });
+                    //     //Prevent users from manually entering a negative number
+                    //     document.querySelectorAll('.ingredient-quantity').forEach(input => {
+                    //     input.addEventListener('input', () => {
+                    //         if (input.value < 0) {
+                    //             input.value = 0; // Reset to 0 if negative number is entered
+                    //         }
+                    //         });
+                    //     });
 
-                        //show form to update recipe
-                        document.getElementById('updateRecipeForm').style.display = 'block';
-                    } else {
-                        //clear if no recipe chosen
-                        //document.getElementById('updateRecipeForm').style.display = 'none';
-                    }
+                    //     //show form to update recipe
+                    //     document.getElementById('updateRecipeForm').style.display = 'block';
+                    // } else {
+                    //     //clear if no recipe chosen
+                    //     //document.getElementById('updateRecipeForm').style.display = 'none';
+                    // }
                 })
                 .catch(error => {
                     console.error('Failed to fetch units:', error);
@@ -1004,6 +996,68 @@
                         quantityInput.value = 0; // Reset to 0 if negative number is entered
                     }
                 });
+        }
+
+        const recipeSelector = document.getElementById('chooseRecipeUpdate');
+        const recipeForm = document.getElementById('updateRecipeForm');
+        const recipeNameInput = document.getElementById('recipe-name');
+        const descriptionTextarea = document.getElementById('recipe-description');
+        const ingredientsListDiv = document.getElementById('update-ingredient-list');
+        const saveRecipeButton = document.getElementById('save-recipe-button');
+
+        saveRecipeButton.addEventListener('click', updateRecipe);
+
+        async function updateRecipe() {
+            const recipeID = parseInt(recipeSelector.value);
+            const recipeName = recipeNameInput.value;
+            const description = descriptionTextarea.value;
+            const ingredientElements = ingredientsListDiv.querySelectorAll('.ingredient-entry');
+            const recipeItems = [];
+
+            ingredientElements.forEach(ingredientElement => {
+                const quantityInput = ingredientElement.querySelector('.ingredient-quantity');
+                const itemSelect = ingredientElement.querySelector('select');
+                const unitSelect = ingredientElement.querySelector('select:nth-of-type(2)');
+                const quantity = parseFloat(quantityInput.value);
+                const unitID = parseInt(unitSelect.value);
+                const itemID = parseInt(itemSelect.value);
+                if(!isNaN(quantity) && unitID && itemID) {
+                    recipeItems.push({ 
+                        itemID: itemID, 
+                        quantity: quantity, 
+                        unitID: unitID 
+                    });
+                }
+            });
+
+            const data = {
+                recipeName: recipeName,
+                description: description,
+                recipeItems: recipeItems,
+                userID: Number(localStorage.getItem('userID'))
+            };
+            try {
+                const response = await fetch(`http://localhost:1337/api-v2/recipe?recipeID=${recipeID}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('Failed to update recipe:', errorData);
+                    alert('Failed to update recipe' + errorData.message);
+                    return;
+                }
+                const responseData = await response.json();
+                console.log('Recipe updated successfully:', responseData);
+                alert('Recipe updated successfully');
+            } catch (error) {
+                console.error('Error updating recipe:', error);
+                alert('Error updating recipe');
+            }
+        }
 
         function saveRecipe() {
             const recipeName = document.getElementById('recipeName').value;
@@ -1157,7 +1211,7 @@
                 alert('Select a recipe.');
             }
         }
-    } 
+    
 
     </script>
 </body>

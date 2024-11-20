@@ -471,7 +471,7 @@ app.get('/api-v2/recipe', (req, res) => {
 });
 
 function validateUnits(oldUnits, newUnits) {
-    const query = `SELECT id, unitType FROM unit WHERE unitID IN (?)`;
+    const query = `SELECT id, unitType FROM unit WHERE id IN (?)`;
     const oldUnitIDs = oldUnits.map(unit => unit.unitID);
     oldUnitIDs.sort();
     const newUnitIDs = newUnits.map(unit => unit.unitID);
@@ -589,7 +589,7 @@ app.patch('/api-v2/recipe', async (req, res) => {
             res.status(404).json({ message: 'Recipe not found' });
             return;
 
-        } else if (results[0].userID !== userID) {
+        } else if (results[0].userID !== Number(userID)) {
             res.status(403).json({ message: 'Unauthorized to update recipe' });
             return;
         } else {
