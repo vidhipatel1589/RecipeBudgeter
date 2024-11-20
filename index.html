@@ -70,7 +70,6 @@
             <li><a href="#home">Home</a></li>
             <li><a href="#add-recipe">Add A New Recipe</a></li>
             <li><a href="#view-recipes">Update A Recipe</a></li>
-            <li><a href="#view-recipe-cost">View Recipe Cost</a></li>
             <li><a href="#" onclick="showLogin()">Logout</a></li>
         </ul>
     </nav>
@@ -135,14 +134,12 @@
     </div>
 
     <script>
-        // Prevent negative input for initial quantity field on page load
         document.addEventListener("DOMContentLoaded", () => {
-            // Attach event listeners to existing `.initialQuantity` fields
             const quantityInputs = document.querySelectorAll('.initialQuantity');
             quantityInputs.forEach(input => {
                 input.addEventListener('input', () => {
                     if (input.value < 0) {
-                        input.value = 0; // Reset to 0 if negative
+                        input.value = 0;
                     }
                 });
             });
@@ -195,35 +192,33 @@
 
         
 
-        // Populate all unit dropdowns
         function populateAddUnitDropdown() {
             const conversions = JSON.parse(localStorage.getItem('conversions')) || {};
-            const dropdowns = document.querySelectorAll('.unitDropdown'); // Select all elements with class unitDropdown
+            const dropdowns = document.querySelectorAll('.unitDropdown');
 
             dropdowns.forEach(dropdown => {
-                dropdown.innerHTML = '<option value="">Select Units</option>'; // Reset options
+                dropdown.innerHTML = '<option value="">Select Units</option>';
 
                 for (const unitName of Object.keys(conversions)) {
                     const option = document.createElement('option');
-                    option.value = unitName; // Set value as the unit name
-                    option.textContent = unitName; // Set text as the unit name
+                    option.value = unitName;
+                    option.textContent = unitName;
                     dropdown.appendChild(option);
                 }
             });
         }
 
-        // Generalized function to populate any dropdown
         function populateAddNewDropdown(dropdown, storageKey) {
             const data = JSON.parse(localStorage.getItem(storageKey)) || {};
-            const dropdowns = dropdown instanceof NodeList || Array.isArray(dropdown) ? dropdown : [dropdown]; // Handle single or multiple elements
+            const dropdowns = dropdown instanceof NodeList || Array.isArray(dropdown) ? dropdown : [dropdown];
 
             dropdowns.forEach(dd => {
-                dd.innerHTML = '<option value="">Select ' + (storageKey === 'items' ? 'Ingredient' : 'Units') + '</option>'; // Reset options
+                dd.innerHTML = '<option value="">Select ' + (storageKey === 'items' ? 'Ingredient' : 'Units') + '</option>';
 
                 for (const [name, value] of Object.entries(data)) {
                     const option = document.createElement('option');
-                    option.value = value; // Set value (ID for items, name for conversions)
-                    option.textContent = name; // Set text (name for both items and conversions)
+                    option.value = value;
+                    option.textContent = name;
                     dd.appendChild(option);
                 }
             });
@@ -310,13 +305,13 @@
             console.error('Failed to fetch items with units:', error);
         });
 
-        // Initial population of dropdowns
         // populateAddItemDropdown();
         // populateAddUnitDropdown();
     </script>
 
     <!------------------------------------------------------------------------------------------->
     <!-- for update a recipe page -->
+
     <div class="section" id="view-recipes" style="display: none;">
         <h2>List of Recipes</h2>
         <h3 style="text-align: center;">Select a recipe</h3>
@@ -345,40 +340,8 @@
     </div>
 
     <!------------------------------------------------------------------------------------------->
-    <!-- for view recipe cost page -->
-    <div class="section" id="view-recipe-cost" style="display: none;">
-        <h2>Recipe Cost</h2>
-        
-        <!-- choose recipe to see cost -->
-        <select id="chooseRecipeCost" onchange="viewRecipeCost()">
-            <option value="">Select a recipe</option>
-        </select>
+    <!-- Scripts -->
 
-        <!-- see details -->
-        <div id="recipeCostDetails" style="display: none;">
-            <h3 id="chosenRecipeName"></h3>
-            <div class="description-box">
-                <textarea readonly id="recipeDescriptionCostBox" placeholder="Recipe Description" required></textarea>
-            </div> 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Ingredient</th>
-                        <th>Quantity</th>
-                        <th>Unit</th>
-                        <th>Price</th>
-                        <th>Availability</th>
-                    </tr>
-                </thead>
-                <tbody id="ingredientCostList">
-                    <!-- Populated with JS -->
-                </tbody>
-            </table>
-            <h4>Total Cost: <span id="totalCost"></span></h4>
-        </div>
-    </div>
-
-    <!------------------------------------------------------------------------------------------->
     <script src="js/login.js"></script>
     <script src="js/home.js"></script>
     <script src="js/updateRecipe.js"></script>
@@ -444,43 +407,18 @@
 
         //hide other pages when switching through pages on nav bar
         function showSection(sectionId) {
-            //get sections
             const sections = document.querySelectorAll('.section');
 
-            //hide other sections
             sections.forEach(section => {
                 section.style.display = 'none';
             });
 
-            //show selected section
             document.getElementById(sectionId).style.display = 'block';
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////
 
-        // temporary list of ingredients, get from database instead later
-        // const ingredients = [
-        //     "Salt",
-        //     "Pepper",
-        //     "Eggs",
-        //     "Butter",
-        //     "Rice",
-        //     "Spinach",
-        //     "Onion",
-        //     "Tomato",
-        //     "Olive oil",
-        //     "Chicken"
-        // ];
-
-        // temporary list of recipes, get from database later
-        // const recipes = {
-        //     "Omelet": { name: "Omelet", ingredients: [{ ingredient: "Eggs", quantity: 2, unit: "Units", price: 0.50, available: true }, { ingredient: "spinach", quantity: 10, unit: "Ounces", price: 0.20, available: true }] },
-        //     "Chicken and Rice": { name: "Chicken and Rice", ingredients: [{ ingredient: "chicken", quantity: 1, unit: "Pounds",available: false }, { ingredient: "rice", quantity: 1, unit: "Cups", price: 1.20, available: true }] }, 
-        // };
-
         let recipes = convertRecipes();
-
-        ////////////////////////////////////////////////////////////////////////////////////////
 
         document.querySelectorAll('.navbar a').forEach(link => {
             link.addEventListener('click', function (event) {
@@ -491,6 +429,8 @@
         });
 
         ////////////////////////////////////////////////////////////////////////////////////////
+
+        // HOME PAGE SCRIPTS
 
         //list of clickable recipes on the home page
         function populateRecipeList() {
@@ -509,6 +449,7 @@
         }
         populateRecipeList();
 
+        // clickable and populates table with recipe details
         function showRecipeDetailsOnHome(chosenRecipeName) {
             const recipeDetailsDiv = document.getElementById('recipeCostDetailsHome');
             const ingredientCostList = document.getElementById('ingredientCostListHome');
@@ -525,58 +466,83 @@
                 let totalCost = 0;
 
 
-                recipe.ingredients.forEach((ingredient) => {
+                recipe.ingredients.forEach((ingredient, index) => {
+                    const inventoryItem = recipe.inventory[index];
+
                     const row = document.createElement('tr');
-                    row.innerHTML = `
-                <td>${ingredient.ingredient}</td>
-                <td>${ingredient.quantity}</td>
-                <td>${ingredient.unit}</td>
-                <td>$${(ingredient.price * ingredient.quantity).toFixed(2)}</td>
-                <td>${ingredient.available ? "In Stock" : "Out of Stock"}</td>
-            `;
+                    if (inventoryItem) {
+                        const pricePerUnit = parseFloat(inventoryItem.price);
+                        const size = parseFloat(inventoryItem.size);
+                        const pricePerSize = (pricePerUnit / size).toFixed(2);
+
+                        row.innerHTML = `
+                            <td>${ingredient.ingredient}</td>
+                            <td>${ingredient.quantity}</td>
+                            <td>${ingredient.unit}</td>
+                            <td>$${pricePerSize} / ${inventoryItem.unit}</td>
+                            <td>${ingredient.available ? "In Stock" : "Out of Stock"}</td>
+                        `;
+                        
+                        totalCost = calTotalCost(chosenRecipeName);
+                    } else {
+                        row.innerHTML = `
+                            <td>${ingredient.ingredient}</td>
+                            <td>${ingredient.quantity}</td>
+                            <td>${ingredient.unit}</td>
+                            <td>Price Not Found</td>
+                            <td>${ingredient.available ? "In Stock" : "Out of Stock"}</td>
+                        `;
+                    }
                     ingredientCostList.appendChild(row);
-                    totalCost += ingredient.price * ingredient.quantity;
                 });
 
 
-                totalCostElement.textContent = `$${totalCost.toFixed(2)}`;
+
+
+                totalCostElement.textContent = `$${totalCost}`;
                 recipeDetailsDiv.style.display = 'block';
             } else {
                 recipeDetailsDiv.style.display = 'none';
             }
         }
 
+        function calTotalCost(recipeCalName) {
+            const recipe = recipes[recipeCalName];
+            let totalCost = 0;
+
+            const conversions = JSON.parse(localStorage.getItem('conversions')) || {};
+
+            recipe.ingredients.forEach((ingredient, index) => {
+                const inventoryItem = recipe.inventory[index];
+
+                if (inventoryItem) {
+                    const ingredientConversion = parseFloat(conversions[ingredient.unit]?.conversion || 1);
+                    const inventoryConversion = parseFloat(conversions[inventoryItem.unit]?.conversion || 1);
+
+                    const inventoryPricePerBaseUnit = inventoryItem.price / (inventoryItem.size * inventoryConversion);
+
+                    const ingredientQuantityInBaseUnits = ingredient.quantity * ingredientConversion;
+
+                    const ingredientCost = ingredientQuantityInBaseUnits * inventoryPricePerBaseUnit;
+                    totalCost += ingredientCost;
+
+                    // console.log(
+                    //     `Ingredient: ${ingredient.ingredient}, Quantity: ${ingredient.quantity}${ingredient.unit}, Price: $${ingredientCost.toFixed(
+                    //         2
+                    //     )}`
+                    // );
+                } else {
+                    console.error(`No inventory found for ingredient: ${ingredient.ingredient}`);
+                }
+            });
+
+            return totalCost.toFixed(2);
+        }
+
+
         ///////////////////////////////////////////////////////////////////////////////////////
 
-        //when user types, it'll find the ingredient in the list
-        function filterIngredients() {
-            const input = document.getElementById('ingredientInput');
-            const filter = input.value.toLowerCase();
-            const dropdown = document.getElementById('dropdownContent');
-            dropdown.innerHTML = ''; // Clear previous results
-
-            if (filter) {
-                const filteredIngredients = ingredients.filter(ingredient => ingredient.toLowerCase().includes(filter));
-
-                filteredIngredients.forEach(ingredient => {
-                    const div = document.createElement('div');
-                    div.textContent = ingredient;
-                    div.onclick = () => selectIngredient(ingredient);
-                    dropdown.appendChild(div);
-                });
-
-                //show list
-                dropdown.style.display = filteredIngredients.length > 0 ? 'block' : 'none';
-            } else {
-                dropdown.style.display = 'none'; //if none match
-            }
-        }
-
-        //choose from dropdown list
-        function selectIngredient(ingredient) {
-            document.getElementById('ingredientInput').value = ingredient;
-            document.getElementById('dropdownContent').style.display = 'none';
-        }
+        // ADD RECIPE
 
         // function updateUnitDropdown(ingredientDropdown, unitDropdown) {
         //     const selectedIngredient = ingredientDropdown.value;
@@ -608,18 +574,16 @@
 
                     ingredientsList.appendChild(ingredientDiv);
 
-                    // Populate the new dropdowns
-                    const newIngredientDropdown = ingredientDiv.querySelector('.ingredientDropdown');
+                            const newIngredientDropdown = ingredientDiv.querySelector('.ingredientDropdown');
                     const newUnitDropdown = ingredientDiv.querySelector('.unitDropdown');
 
-                    populateAddNewDropdown(newIngredientDropdown, 'items'); // Populate items dropdown
-                    populateAddNewDropdown(newUnitDropdown, 'conversions'); // Populate units dropdown
+                    populateAddNewDropdown(newIngredientDropdown, 'items');
+                    populateAddNewDropdown(newUnitDropdown, 'conversions');
 
-                    // Prevent negative values in the new quantity field
-                    const newQuantityInput = ingredientDiv.querySelector('.initialQuantity');
+                            const newQuantityInput = ingredientDiv.querySelector('.initialQuantity');
                     newQuantityInput.addEventListener('input', () => {
                         if (newQuantityInput.value < 0) {
-                            newQuantityInput.value = 0; // Reset to 0 if negative
+                            newQuantityInput.value = 0;
                         }
                     });
                 })
@@ -629,16 +593,16 @@
                 });
             
         }
-
         function deleteIngredient(button) {
-            const ingredientDiv = button.parentElement; // Get the parent div of the delete button
-            ingredientDiv.remove(); // Remove the ingredient row from the DOM
+            const ingredientDiv = button.parentElement;
+            ingredientDiv.remove();
         }
 
+        // Queries the database to save the new recipe
         function saveNewRecipe() {
-            const recipeName = document.querySelector('.add-recipe-entry input[type="text"]').value; // Recipe Name input
-            const recipeDescription = document.querySelector('.add-recipe-entry textarea').value; // Recipe Description input
-            const ingredientsList = document.querySelectorAll('#ingredients-list .ingredient'); // All ingredients added
+            const recipeName = document.querySelector('.add-recipe-entry input[type="text"]').value;
+            const recipeDescription = document.querySelector('.add-recipe-entry textarea').value;
+            const ingredientsList = document.querySelectorAll('#ingredients-list .ingredient');
 
             const items = JSON.parse(localStorage.getItem('items')) || {};
             const conversions = JSON.parse(localStorage.getItem('conversions')) || {};
@@ -646,13 +610,13 @@
             const newIngredients = Array.from(ingredientsList).map(ingredientDiv => {
                 const ingredientDropdown = ingredientDiv.querySelector('.ingredientDropdown');
                 const ingredientName = ingredientDropdown.options[ingredientDropdown.selectedIndex].textContent;
-                const quantity = parseFloat(ingredientDiv.querySelector('.initialQuantity').value); // Select by class
+                const quantity = parseFloat(ingredientDiv.querySelector('.initialQuantity').value);
                 const unitDropdown = ingredientDiv.querySelector('.unitDropdown');
                 const unit = unitDropdown.options[unitDropdown.selectedIndex].textContent;
 
                 return {
                     ingredientName: ingredientName,
-                    itemID: items[ingredientName] || null, // Get itemID from localStorage
+                    itemID: items[ingredientName] || null,
                     quantity: quantity,
                     unit: unit,
                     unitID: conversions[unit].unitID
@@ -667,7 +631,7 @@
                 body: JSON.stringify({
                     name: recipeName,
                     description: recipeDescription,
-                    userID: localStorage.getItem('userID'), // Get userID from localStorage
+                    userID: localStorage.getItem('userID'),
                 })
             })
                 .then(response => response.json())
@@ -751,8 +715,6 @@
                     console.error('Error:', error);
                 });
         }
-
-
         function getUserRecipes(userID) {
             const url = new URL('http://localhost:1337/api-v2/user/recipes');
             url.searchParams.append('userID', userID);
@@ -778,14 +740,16 @@
 
         ////////////////////////////////////////////////////////////////////////////////////////
 
+        // UPDATE RECIPE
+
         //dropdown for recipes
         function populateDropdown() {
             getUserRecipes(localStorage.getItem('userID'))
                 .then(recipes => {
                     console.log('Recipes:', recipes);
                     const dropdown = document.getElementById('chooseRecipeUpdate');
-                    dropdown.innerHTML = ''; // Clear the previous options
-                    const uniqueRecipes = new Set(); // Use a Set to track unique recipe names
+                    dropdown.innerHTML = '';
+                    const uniqueRecipes = new Set();
 
                     recipes.forEach(recipe => {
                         const option = document.createElement('option');
@@ -798,6 +762,15 @@
                     console.error('Failed to fetch recipes:', error);
                 });
             
+            for (let recipeName in recipes) {
+                if (!uniqueRecipes.has(recipeName)) {
+                    uniqueRecipes.add(recipeName);
+                    const option = document.createElement('option');
+                    option.value = recipeName;
+                    option.textContent = recipeName;
+                    dropdown.appendChild(option);
+                }
+            }
         }
         populateDropdown();
 
@@ -997,7 +970,7 @@
                 const quantityInput = ingredientDiv.querySelector('.ingredient-quantity');
                 quantityInput.addEventListener('input', () => {
                     if (quantityInput.value < script) {
-                        quantityInput.value = 0; // Reset to 0 if negative number is entered
+                        quantityInput.value = 0;
                     }
                 });
         }
@@ -1104,103 +1077,7 @@
                     });
                 });             
         }
-
-        function saveRecipe() {
-            const recipeName = document.getElementById('recipeName').value;
-            const ingredientsList = document.getElementById('ingredient-list').children;
-
-            const updatedIngredients = Array.from(ingredientsList).map(ingredientDiv => ({
-                ingredient: ingredientDiv.querySelector('.ingredient-name').value,
-                quantity: parseFloat(ingredientDiv.querySelector('.ingredient-quantity').value),
-                unit: ingredientDiv.querySelector('.ingredient-unit').value
-            }));
-
-            //update the recipe (change later to connect to database)
-            recipes[recipeName] = { name: recipeName, ingredients: updatedIngredients };
-
-            alert('Recipe updated successfully!');
-        }
-
-        function deleteRecipe() {
-            // const recipeName = document.getElementById('recipeName').value;
-            // const ingredientsList = document.getElementById('ingredient-list').children;
-            // //update the recipe (change later to connect to database)
-            // //recipes[recipeName] = { name: recipeName, ingredients: updatedIngredients };
-            // if (recipes.hasOwnProperty(recipeName)) {
-            //     delete recipes[recipeName];
-            //     alert('Recipe deleted successfully');
-            // }
-            // else {
-            //     alert('error cannot delete');
-            // }
-
-            const recipeDel = document.getElementById('chooseRecipeUpdate');
-            const selectedRecipeName = recipeDel.options[recipeDel.selectedIndex].textContent;
-
-            const allRecipes = JSON.parse(localStorage.getItem('recipes'));
-            const selectedRecipe = allRecipes.find(recipe => recipe.recipeName === selectedRecipeName);
-
-            if (selectedRecipe && selectedRecipe.recipeID) {
-                const recipeID = selectedRecipe.recipeID;
-                fetch('/api/deleteRecipe', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ recipeID }),
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.message === 'Recipe deleted successfully') {
-                            alert('Recipe deleted successfully');
-                            
-                            const userID = localStorage.getItem('userID');
-                            fetch('http://localhost:1337/api/userRecipe', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({ userID })
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                localStorage.setItem('recipes', JSON.stringify(data));
-                                
-                                const recipesNew = convertRecipes();
-                                const recipeList = document.getElementById('recipeList');
-                                recipeList.innerHTML = '';
-
-                                for (const recipeName in recipesNew) {
-                                    const recipeItem = document.createElement('div');
-                                    recipeItem.className = 'recipe-item';
-                                    recipeItem.textContent = recipeName;
-                                    recipeItem.onclick = () => showRecipeDetailsOnHome(recipeName);
-                                    recipeList.appendChild(recipeItem);
-                                }
-
-
-                                document.getElementById('navbar').style.display = 'block';
-                                showSection('home');
-                                document.querySelector('.wrapper').style.display = 'none';
-                            });
-
-                        } else {
-                            alert('Failed to delete recipe');
-                        }
-                    })
-                    .catch(err => {
-                        console.error('Error deleting recipe:', err);
-                        alert('Error deleting recipe');
-                    });
-            } else {
-                alert('Recipe not found!');
-            }
-
-
-            
-
-        }
-
+        
         ////////////////////////////////////////////////////////////////////////////////////////
 
         //shows dropdown for the recipes to select from to show cost

@@ -116,7 +116,6 @@ app.post('/api/userRecipe', (req, res) => {
             return res.status(500).json({ message: 'Failed to fetch recipes' });
         }
     
-        // If no recipes found, return an empty array
         if (recipes.length === 0) {
             return res.status(200).json([]);
         }
@@ -208,7 +207,7 @@ app.post('/api/addRecipe', (req, res) => {
 
 // Update Recipe
 app.post('/api/updateRecipe', (req, res) => {
-    const { recipeID } = req.body
+    const { recipeID, recipeName, description, ingredients } = req.body
     const query = `UPDATE recipe SET recipeName = ?, description = ? WHERE recipeID = ?`
     connection.query(query, [recipeName, description, recipeID], (err, results) => {
         if (err) {
@@ -219,6 +218,7 @@ app.post('/api/updateRecipe', (req, res) => {
         }
     })
 })
+
 
 // Delete Recipe
 app.post('/api/deleteRecipe', (req, res) => {
