@@ -129,7 +129,7 @@
                  
             </div>
 
-            <button type="button" onclick="addIngredient()">Add Another Ingredient</button>
+            <button type="button" id="addRowButton">Add Another Ingredient</button>
             <button type="button" onclick="saveNewRecipe()">Save Recipe</button>
         </form>
     </div>
@@ -272,6 +272,8 @@
             });
         }
 
+        
+
         function getAllUnits() {
             console.log('fetching all units');
             return fetch('http://localhost:1337/api/getAllUnits')
@@ -295,6 +297,10 @@
             console.log('Items with units:', itemsWithUnits);
             console.log('Units:', units);
             populateRow(itemsWithUnits, units);
+
+            document.getElementById('addRowButton').addEventListener('click', () => {
+                populateRow(itemsWithUnits, units);
+            });
         })
         .catch(error => {
             console.error('Failed to fetch items with units:', error);
