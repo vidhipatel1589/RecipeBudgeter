@@ -871,6 +871,7 @@
                         const itemID = item.itemID;
                         console.log('Item:', item);
                         const unitID = item.unitID;
+                        console.log('Unit ID:', unitID);
                         const unitType = units.units.find(unit => unit.id === unitID)?.unitType ?? "";
                         console.log('Unit type:', unitType);
                         const validUnits = units.units.filter(unit => unit.unitType === unitType).map(unit => ({id: unit.id, name: unit.unitName}));
@@ -878,15 +879,47 @@
                         const ingredientDiv = document.createElement('div');
                         ingredientDiv.className = 'ingredient-entry';
                         ingredientDiv.innerHTML = `
-                            <input type="text" value="${itemsWithUnits.find(itemWithUnit => itemID === itemWithUnit.itemID).itemName}" class="ingredient-name">
+                            <select class="ingredient-dropdown" required>
+                                ${itemsWithUnits.map(itemWithUnit => `<option value="${itemWithUnit.itemID}" data-unit-id="${itemWithUnit.unitID}">${itemWithUnit.itemName}</option>`).join('')}
+                            </select>
+                            
                             <input type="number" value="${item.quantity}" class="ingredient-quantity" min="0">
                             <select class="ingredient-unit">
                                 ${validUnits.map(unit => `<option value="${unit.id}">${unit.name}</option>`).join('')}
                             </select>
                             <button type="button" class="X-button" onclick="deleteIngredient(this)">X</button>
                         `;
+
                         ingredientsList.appendChild(ingredientDiv);
+                        const ingredientDropdown = ingredientDiv.querySelector('.ingredient-dropdown');
+                        ingredientDropdown.value = item.itemID;
+
+                        const unitDropdown = ingredientDiv.querySelector('.ingredient-unit');
+                        ingredientDropdown.addEventListener('change', () => {
+                            const selectedOption = ingredientDropdown.options[ingredientDropdown.selectedIndex];
+                            console.log('Selected option:', selectedOption);
+                            console.log('data-unit-id:', selectedOption.getAttribute('data-unit-id'));
+                            const unitID2 = Number(selectedOption.getAttribute('data-unit-id'));
+                            console.log('Selected unit ID:', unitID2);
+                            const unitType = units.units.find(unit => unit.id === unitID2)?.unitType ?? '';
+                            console.log('Selected unit type:', unitType);
+                            unitDropdown.innerHTML = '<option value="">Select Units</option>'; // Reset options
+                            const filteredUnits = units.units.filter(unit => unit.unitType === unitType);
+                            filteredUnits.forEach(unit => {
+                                const option = document.createElement('option');
+                                option.value = unit.id;
+                                option.textContent = unit.unitName;
+                                unitDropdown.appendChild(option);
+                            });
+                        });
                         document.getElementById('updateRecipeForm').style.display = 'block';
+                        document.querySelectorAll('.ingredient-quantity').forEach(input => {
+                        input.addEventListener('input', () => {
+                            if (input.value < 0) {
+                                input.value = 0; // Reset to 0 if negative number is entered
+                            }
+                            });
+                        });
                     });
 
 
