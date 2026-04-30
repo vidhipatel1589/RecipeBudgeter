@@ -297,7 +297,7 @@
                 const filteredUnits = units.units.filter(unit => unit.unitType === unitType);
                 filteredUnits.forEach(unit => {
                     const option = document.createElement('option');
-                    option.value = unit.unitID;
+                    option.value = unit.id;
                     option.textContent = unit.unitName;
                     unitDropdown.appendChild(option);
                 });
@@ -675,6 +675,42 @@
             const recipeName = document.querySelector('.add-recipe-entry input[type="text"]').value;
             const recipeDescription = document.querySelector('.add-recipe-entry textarea').value;
             const ingredientsList = document.querySelectorAll('#ingredients-list .ingredient');
+            
+            if (!recipeName) {
+                alert('Please enter a recipe name.');
+            return;
+            }
+
+            if (!recipeDescription) {
+                alert('Please enter a recipe description.');
+            return;
+            }
+
+            if (ingredientsList.length === 0) {
+                alert('Please add at least one ingredient.');
+            return;
+            }
+
+            for (const ingredientDiv of ingredientsList) {
+                const ingredientDropdown = ingredientDiv.querySelector('.ingredientDropdown');
+                const quantityInput = ingredientDiv.querySelector('.initialQuantity');
+                const unitDropdown = ingredientDiv.querySelector('.unitDropdown');
+
+            if (!ingredientDropdown.value) {
+                alert('Please select an ingredient.');
+                return;
+            }
+
+            if (!quantityInput.value || Number(quantityInput.value) <= 0) {
+                alert('Please enter a quantity greater than 0.');
+                return;
+            }
+
+            if (!unitDropdown.value) {
+                alert('Please select a unit.');
+                return;
+            }
+    }
 
             const items = JSON.parse(localStorage.getItem('items')) || {};
             const conversions = JSON.parse(localStorage.getItem('conversions')) || {};
