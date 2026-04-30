@@ -670,6 +670,16 @@
             ingredientDiv.remove();
         }
 
+        //helper function - clear add recipe form
+        function clearRecipeForm() {
+            document.querySelector('.add-recipe-entry input[type="text"]').value = '';
+            document.querySelector('.add-recipe-entry textarea').value = '';
+
+            const ingredientsList = document.getElementById('ingredients-list');
+            ingredientsList.innerHTML = '';
+        }
+
+
         // Queries the database to save the new recipe
         function saveNewRecipe() {
             const recipeName = document.querySelector('.add-recipe-entry input[type="text"]').value;
@@ -774,7 +784,8 @@
                                     console.error('Error adding ingredient:', error);
                                 });
                         });
-
+                        
+                        
                         const userID = localStorage.getItem('userID');
                         fetch('http://localhost:1337/api/userRecipe', {
                             method: 'POST',
@@ -787,11 +798,11 @@
                         .then(data => {
                             localStorage.setItem('recipes', JSON.stringify(data));
                             
-                            const recipesNew = convertRecipes();
+                            recipes = convertRecipes();
                             const recipeList = document.getElementById('recipeList');
                             recipeList.innerHTML = '';
 
-                            for (const recipeName in recipesNew) {
+                            for (const recipeName in recipes) {
                                 const recipeItem = document.createElement('div');
                                 recipeItem.className = 'recipe-item';
                                 recipeItem.textContent = recipeName;
@@ -799,6 +810,7 @@
                                 recipeList.appendChild(recipeItem);
                             }
 
+                            clearRecipeForm();
 
                             document.getElementById('navbar').style.display = 'block';
                             showSection('home');
@@ -809,9 +821,6 @@
                             console.error('Error fetching recipes:', error);
                             alert('Error fetching recipes');
                         });
-
-
-                        
                         
                     } else {
                         console.error('Failed to add recipe:', data.message);
