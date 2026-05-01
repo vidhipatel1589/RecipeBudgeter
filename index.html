@@ -1,25 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>Recipe Budgeter</title>
     <link rel="stylesheet" href="style.css">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css'
-          rel='stylesheet'>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
+
 <body>
     <div class="wrapper">
         <h1 class="Title">Recipe Budgeter</h1>
         <form id="loginForm">
             <h1>Login</h1>
             <div class="input-box">
-                <input type="text" id="username" placeholder="Username/Email"
-                       required>
+                <input type="text" id="username" placeholder="Username/Email" required>
                 <i class='bx bxs-user'></i>
             </div>
 
             <div class="input-box">
-                <input type="password" id="password"
-                       placeholder="Password" required>
+                <input type="password" id="password" placeholder="Password" required>
                 <i class='bx bxs-lock-alt'></i>
             </div>
 
@@ -31,7 +30,7 @@
         </form>
     </div>
 
-    <div class="wrapper" id="signupWrapper" style="display: none;"> 
+    <div class="wrapper" id="signupWrapper" style="display: none;">
         <form id="signupForm">
             <h1 class="Title">Recipe Budgeter</h1>
             <h1 class="Subtitle">Sign Up</h1>
@@ -39,12 +38,12 @@
             <div class="input-box">
                 <input type="text" id="name" placeholder="Name" required>
                 <i class='bx bxs-envelope'></i>
-            </div>  
+            </div>
 
             <div class="input-box">
                 <input type="text" id="newUsername" placeholder="Username" required>
                 <i class='bx bxs-user'></i>
-            </div> 
+            </div>
 
             <div class="input-box">
                 <input type="password" id="newPassword" placeholder="Password" required>
@@ -54,13 +53,13 @@
             <div class="input-box">
                 <input type="password" id="confirmpassword" placeholder="Confirm Password" required>
                 <i class='bx bxs-lock-alt'></i>
-            </div>     
-            
+            </div>
+
             <button type="submit" class="login-button">Sign Up</button>
 
             <div class="register">
                 <a href="#" onclick="showLogin()">Already have an account? Login</a>
-            </div>    
+            </div>
         </form>
     </div>
 
@@ -92,7 +91,7 @@
             <h4 id="chosenRecipeNameHome"></h4>
             <div class="description-box">
                 <textarea readonly id="recipeDescriptionBox" placeholder="Recipe Description" required></textarea>
-            </div> 
+            </div>
             <table>
                 <thead>
                     <tr>
@@ -123,9 +122,9 @@
             </div>
             <div class="description-box">
                 <textarea placeholder="Recipe Description" required></textarea>
-            </div>    
+            </div>
             <div class="ingredients-list" id="ingredients-list">
-                 
+
             </div>
 
             <button type="button" id="addRowButton">Add Another Ingredient</button>
@@ -134,7 +133,6 @@
     </div>
 
     <script>
-
         const addRecipeLink = document.getElementById('add-recipe-link');
         addRecipeLink.addEventListener('click', () => {
             showSection('add-recipe');
@@ -145,15 +143,15 @@
             //populateDropdown();
             console.log('Fetching recipes');
             getUserRecipes(localStorage.getItem('userID'))
-            .then(recipes => {
-                populateRecipeDropdown(recipes);
-            })
-            .catch(error => {
-                console.error('Failed to fetch recipes:', error);
-            });
+                .then(recipes => {
+                    populateRecipeDropdown(recipes);
+                })
+                .catch(error => {
+                    console.error('Failed to fetch recipes:', error);
+                });
             //console.log('Recipes:', recipes);
             showSection('view-recipes');
-            
+
 
         });
 
@@ -167,7 +165,7 @@
                 option.textContent = recipe.recipeName;
                 updateRecipesDropdown.appendChild(option);
             });
-            
+
 
         }
 
@@ -205,7 +203,7 @@
             getItemsWithUnits()
                 .then(itemsWithUnits => {
                     //console.log('Items with units:', itemsWithUnits);
-                
+
                     const dropdowns = document.querySelectorAll('.ingredientDropdown'); // Select all elements with class ingredientDropdown
 
                     dropdowns.forEach(dropdown => {
@@ -223,11 +221,11 @@
                 .catch(error => {
                     console.error('Failed to fetch items with units:', error);
                 });
-        
-            
+
+
         }
 
-        
+
 
         function populateAddUnitDropdown() {
             const conversions = JSON.parse(localStorage.getItem('conversions')) || {};
@@ -362,7 +360,7 @@
         <h2>List of Recipes</h2>
         <h3 style="text-align: center;">Select a recipe</h3>
         <!-- select recipe -->
-        <select id="chooseRecipeUpdate" >
+        <select id="chooseRecipeUpdate">
             <option value="">Select a recipe</option>
         </select>
 
@@ -371,17 +369,17 @@
             <h1>
                 <input type="text" id="recipe-name" required>
             </h1>
-            
+
             <div class="description-box">
                 <textarea id="recipe-description" placeholder="Recipe Description" required></textarea>
-            </div>  
+            </div>
             <div class="update-ingredients-list" id="update-ingredients-list">
-                    <!-- Ingredient items will be dynamically added here -->
+                <!-- Ingredient items will be dynamically added here -->
             </div>
 
             <button type="button" id="update-add-ingredient-button">Add Another Ingredient</button>
             <button type="button" id="save-recipe-button">Save Recipe</button>
-            <button type="button" id = "update-delete-recipe-button">Delete Recipe</button>
+            <button type="button" id="update-delete-recipe-button">Delete Recipe</button>
         </form>
     </div>
 
@@ -392,33 +390,48 @@
     <script src="js/home.js"></script>
     <script src="js/updateRecipe.js"></script>
     <script>
-
         const updateDeleteRecipeButton = document.getElementById('update-delete-recipe-button');
         updateDeleteRecipeButton.addEventListener('click', () => {
             const recipeID = Number(document.getElementById('chooseRecipeUpdate').value);
             deleteRecipe(recipeID);
         });
 
+        function clearUpdateRecipeForm() {
+            document.getElementById('chooseRecipeUpdate').value = '';
+            document.getElementById('recipe-name').value = '';
+            document.getElementById('recipe-description').value = '';
+            document.getElementById('update-ingredients-list').innerHTML = '';
+            document.getElementById('updateRecipeForm').style.display = 'none';
+        }
+
         function deleteRecipe(recipeID) {
             const userID = Number(localStorage.getItem('userID'));
             fetch('http://localhost:1337/api-v2/deleteRecipe', {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ recipeID, userID })
-            })
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        recipeID,
+                        userID
+                    })
+                })
                 .then(response => response.json())
                 .then(data => {
                     console.log('Recipe deleted:', data);
                     alert('Recipe deleted');
+
+                    clearUpdateRecipeForm()
+
+                    loadHomePage();
+                    showSection('home');
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     alert('Error deleting recipe');
                 });
         }
-        
+
         function getAllUnits() {
             //console.log('fetching all units');
             return fetch('http://localhost:1337/api/getAllUnits')
@@ -462,7 +475,7 @@
             }
             return units.units.filter
         }
-    
+
 
         function showLogin() {
             document.getElementById('signupWrapper').style.display = 'none';
@@ -489,11 +502,40 @@
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////
+        function loadHomePage() {
+            const userID = localStorage.getItem('userID');
 
-        let recipes = convertRecipes();
+            if (!userID) {
+                console.error('No userID found.');
+                return;
+            }
+
+            fetch('http://localhost:1337/api/userRecipe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        userID
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    localStorage.setItem('recipes', JSON.stringify(data));
+                    recipes = convertRecipes();
+                    populateRecipeList();
+                    document.getElementById('recipeCostDetailsHome').style.display = 'none';
+                })
+                .catch(error => {
+                    console.error('Error loading recipes:', error);
+                });
+        }
+
+        let recipes = {};
+        loadHomePage();
 
         document.querySelectorAll('.navbar a').forEach(link => {
-            link.addEventListener('click', function (event) {
+            link.addEventListener('click', function(event) {
                 event.preventDefault();
                 const targetSection = this.getAttribute('href').substring(1);
                 showSection(targetSection);
@@ -507,7 +549,7 @@
         //list of clickable recipes on the home page
         function populateRecipeList() {
             const recipeList = document.getElementById('recipeList');
-            
+
             recipeList.innerHTML = '';
 
             for (const recipeName in recipes) {
@@ -516,10 +558,9 @@
                 recipeItem.textContent = recipeName;
                 recipeItem.onclick = () => showRecipeDetailsOnHome(recipeName);
                 recipeList.appendChild(recipeItem);
-                
+
             }
         }
-        populateRecipeList();
 
         // clickable and populates table with recipe details
         function showRecipeDetailsOnHome(chosenRecipeName) {
@@ -554,7 +595,7 @@
                             <td>$${pricePerSize} / ${inventoryItem.unit}</td>
                             <td>${ingredient.available ? "In Stock" : "Out of Stock"}</td>
                         `;
-                        
+
                         totalCost = calTotalCost(chosenRecipeName);
                     } else {
                         row.innerHTML = `
@@ -588,8 +629,8 @@
                 const inventoryItem = recipe.inventory[index];
 
                 if (inventoryItem) {
-                    const ingredientConversion = parseFloat(conversions[ingredient.unit]?.conversion || 1);
-                    const inventoryConversion = parseFloat(conversions[inventoryItem.unit]?.conversion || 1);
+                    const ingredientConversion = parseFloat(conversions[ingredient.unit] ?.conversion || 1);
+                    const inventoryConversion = parseFloat(conversions[inventoryItem.unit] ?.conversion || 1);
 
                     const inventoryPricePerBaseUnit = inventoryItem.price / (inventoryItem.size * inventoryConversion);
 
@@ -646,13 +687,13 @@
 
                     ingredientsList.appendChild(ingredientDiv);
 
-                            const newIngredientDropdown = ingredientDiv.querySelector('.ingredientDropdown');
+                    const newIngredientDropdown = ingredientDiv.querySelector('.ingredientDropdown');
                     const newUnitDropdown = ingredientDiv.querySelector('.unitDropdown');
 
                     populateAddNewDropdown(newIngredientDropdown, 'items');
                     populateAddNewDropdown(newUnitDropdown, 'conversions');
 
-                            // const newQuantityInput = ingredientDiv.querySelector('.initialQuantity');
+                    // const newQuantityInput = ingredientDiv.querySelector('.initialQuantity');
                     // newQuantityInput.addEventListener('input', () => {
                     //     if (newQuantityInput.value < 0) {
                     //         newQuantityInput.value = 0;
@@ -660,11 +701,12 @@
                     // });
                 })
 
-                .catch(error => {
-                    console.error('Failed to fetch units:', error);
-                });
-            
+            .catch(error => {
+                console.error('Failed to fetch units:', error);
+            });
+
         }
+
         function deleteIngredient(button) {
             const ingredientDiv = button.parentElement;
             ingredientDiv.remove();
@@ -685,20 +727,20 @@
             const recipeName = document.querySelector('.add-recipe-entry input[type="text"]').value;
             const recipeDescription = document.querySelector('.add-recipe-entry textarea').value;
             const ingredientsList = document.querySelectorAll('#ingredients-list .ingredient');
-            
+
             if (!recipeName) {
                 alert('Please enter a recipe name.');
-            return;
+                return;
             }
 
             if (!recipeDescription) {
                 alert('Please enter a recipe description.');
-            return;
+                return;
             }
 
             if (ingredientsList.length === 0) {
                 alert('Please add at least one ingredient.');
-            return;
+                return;
             }
 
             for (const ingredientDiv of ingredientsList) {
@@ -706,21 +748,21 @@
                 const quantityInput = ingredientDiv.querySelector('.initialQuantity');
                 const unitDropdown = ingredientDiv.querySelector('.unitDropdown');
 
-            if (!ingredientDropdown.value) {
-                alert('Please select an ingredient.');
-                return;
-            }
+                if (!ingredientDropdown.value) {
+                    alert('Please select an ingredient.');
+                    return;
+                }
 
-            if (!quantityInput.value || Number(quantityInput.value) <= 0) {
-                alert('Please enter a quantity greater than 0.');
-                return;
-            }
+                if (!quantityInput.value || Number(quantityInput.value) <= 0) {
+                    alert('Please enter a quantity greater than 0.');
+                    return;
+                }
 
-            if (!unitDropdown.value) {
-                alert('Please select a unit.');
-                return;
+                if (!unitDropdown.value) {
+                    alert('Please select a unit.');
+                    return;
+                }
             }
-    }
 
             const items = JSON.parse(localStorage.getItem('items')) || {};
             const conversions = JSON.parse(localStorage.getItem('conversions')) || {};
@@ -742,91 +784,61 @@
             });
 
             fetch('http://localhost:1337/api/addRecipe', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    name: recipeName,
-                    description: recipeDescription,
-                    userID: localStorage.getItem('userID'),
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: recipeName,
+                        description: recipeDescription,
+                        userID: localStorage.getItem('userID'),
+                    })
                 })
-            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.recipeID) {
                         console.log('Recipe added successfully with ID:', data.recipeID);
                         const recipeID = data.recipeID;
 
-                        newIngredients.forEach(ingredient => {
-                            if (!ingredient.itemID) {
-                                console.error(`Item ID not found for ingredient: ${ingredient.ingredientName}`);
-                                return;
-                            }
+                        Promise.all(
+                                newIngredients.map(ingredient => {
+                                    if (!ingredient.itemID) {
+                                        console.error(`Item ID not found for ingredient: ${ingredient.ingredientName}`);
+                                        return Promise.resolve();
+                                    }
 
-                            fetch('http://localhost:1337/api/addRecipeItem', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({
-                                    recipeID: recipeID,
-                                    itemID: ingredient.itemID,
-                                    quantity: ingredient.quantity,
-                                    unitID: ingredient.unitID
+                                    return fetch('http://localhost:1337/api/addRecipeItem', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({
+                                            recipeID: recipeID,
+                                            itemID: ingredient.itemID,
+                                            quantity: ingredient.quantity,
+                                            unitID: ingredient.unitID
+                                        })
+                                    }).then(response => response.json());
                                 })
+                            )
+                            .then(() => {
+                                loadHomePage();
+                                clearRecipeForm();
+
+                                document.getElementById('navbar').style.display = 'block';
+                                showSection('home');
+                                document.querySelector('.wrapper').style.display = 'none';
                             })
-                                .then(response => response.json())
-                                .then(data => {
-                                    console.log(`Ingredient ${ingredient.ingredientName} added:`, data);
-                                })
-                                .catch(error => {
-                                    console.error('Error adding ingredient:', error);
-                                });
-                        });
-                        
-                        
-                        const userID = localStorage.getItem('userID');
-                        fetch('http://localhost:1337/api/userRecipe', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ userID })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            localStorage.setItem('recipes', JSON.stringify(data));
-                            
-                            recipes = convertRecipes();
-                            const recipeList = document.getElementById('recipeList');
-                            recipeList.innerHTML = '';
+                            .catch(error => {
+                                console.error('Error adding recipe ingredients:', error);
+                                alert('Error adding recipe ingredients');
+                            });
 
-                            for (const recipeName in recipes) {
-                                const recipeItem = document.createElement('div');
-                                recipeItem.className = 'recipe-item';
-                                recipeItem.textContent = recipeName;
-                                recipeItem.onclick = () => showRecipeDetailsOnHome(recipeName);
-                                recipeList.appendChild(recipeItem);
-                            }
-
-                            clearRecipeForm();
-
-                            document.getElementById('navbar').style.display = 'block';
-                            showSection('home');
-                            document.querySelector('.wrapper').style.display = 'none';
-
-                        })
-                        .catch(error => {
-                            console.error('Error fetching recipes:', error);
-                            alert('Error fetching recipes');
-                        });
-                        
                     } else {
                         console.error('Failed to add recipe:', data.message);
                     }
 
-                    
+
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -838,9 +850,11 @@
             url.searchParams.append('userID', userID);
 
             return fetch(url, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-            })
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('HTTP Error: ' + response.status);
@@ -879,7 +893,7 @@
         //         .catch(error => {
         //             console.error('Failed to fetch recipes:', error);
         //         });
-            
+
         //     for (let recipeName in recipes) {
         //         if (!uniqueRecipes.has(recipeName)) {
         //             uniqueRecipes.add(recipeName);
@@ -892,16 +906,18 @@
         // }
         // populateDropdown();
         const updateRecipeDropdown = document.getElementById('chooseRecipeUpdate');
-        updateRecipeDropdown.addEventListener('change', getRecipe(updateRecipeDropdown.value));
+        //updateRecipeDropdown.addEventListener('change', getRecipe(updateRecipeDropdown.value));
 
         function getRecipe(recipeID) {
             const url = new URL('http://localhost:1337/api-v2/recipe');
             url.searchParams.append('recipeID', recipeID);
 
             return fetch(url, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-            })
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('HTTP Error: ' + response.status);
@@ -922,9 +938,11 @@
             url.searchParams.append('recipeID', recipeID);
 
             return fetch(url, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-            })
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('HTTP Error: ' + response.status);
@@ -946,28 +964,31 @@
         function loadRecipeData() {
             const chosenRecipeID = Number(document.getElementById('chooseRecipeUpdate').value);
             Promise.all([getAllUnits(), getRecipeItems(chosenRecipeID), getRecipe(chosenRecipeID), getItemsWithUnits()])
-                .then(([ units, recipeItems, recipe, itemsWithUnits]) => {
-                    //console.log('Units by type:', unitsByType);
-                    // console.log('Recipe items:', recipeItems);
-                    // console.log('Recipe:', recipe);
+                .then(([units, recipeItems, recipe, itemsWithUnits]) => {
+                        //console.log('Units by type:', unitsByType);
+                        // console.log('Recipe items:', recipeItems);
+                        // console.log('Recipe:', recipe);
 
-                    document.getElementById('recipe-name').value = recipe[0]?.recipeName;
-                    document.querySelector('#updateRecipeForm textarea').value = recipe[0]?.description;
-                    const ingredientsList = document.getElementById('update-ingredients-list');
-                    //clear out previous
-                    ingredientsList.innerHTML = '';
-                    recipeItems.forEach(item => {
-                        const itemID = item.itemID;
-                        // console.log('Item:', item);
-                        const unitID = item.unitID;
-                        // console.log('Unit ID:', unitID);
-                        const unitType = units.units.find(unit => unit.id === unitID)?.unitType ?? "";
-                        // console.log('Unit type:', unitType);
-                        const validUnits = units.units.filter(unit => unit.unitType === unitType).map(unit => ({id: unit.id, name: unit.unitName}));
-                        // console.log('Valid units:', validUnits);
-                        const ingredientDiv = document.createElement('div');
-                        ingredientDiv.className = 'update-ingredient-entry';
-                        ingredientDiv.innerHTML = `
+                        document.getElementById('recipe-name').value = recipe[0]?.recipeName;
+                        document.querySelector('#updateRecipeForm textarea').value = recipe[0]?.description;
+                        const ingredientsList = document.getElementById('update-ingredients-list');
+                        //clear out previous
+                        ingredientsList.innerHTML = '';
+                        recipeItems.forEach(item => {
+                                    const itemID = item.itemID;
+                                    // console.log('Item:', item);
+                                    const unitID = item.unitID;
+                                    // console.log('Unit ID:', unitID);
+                                    const unitType = units.units.find(unit => unit.id === unitID)?.unitType ?? "";
+                                    // console.log('Unit type:', unitType);
+                                    const validUnits = units.units.filter(unit => unit.unitType === unitType).map(unit => ({
+                                        id: unit.id,
+                                        name: unit.unitName
+                                    }));
+                                    // console.log('Valid units:', validUnits);
+                                    const ingredientDiv = document.createElement('div');
+                                    ingredientDiv.className = 'update-ingredient-entry';
+                                    ingredientDiv.innerHTML = `
                             <select class="ingredient-dropdown" required>
                                 ${itemsWithUnits.map(itemWithUnit => `<option value="${itemWithUnit.itemID}" data-unit-id="${itemWithUnit.unitID}">${itemWithUnit.itemName}</option>`).join('')}
                             </select>
@@ -1066,7 +1087,7 @@
         }
 
         //add another ingredient to recipe
-        function addAnotherIngredient() {
+  /**      function addAnotherIngredient() {
             const ingredientsList = document.getElementById('ingredient-list');
 
             const ingredientDiv = document.createElement('div');
@@ -1093,7 +1114,7 @@
                         quantityInput.value = 0;
                     }
                 });
-        }
+        } */
 
         
         const saveRecipeButton = document.getElementById('save-recipe-button');
@@ -1158,6 +1179,9 @@
                 const responseData = await response.json();
                 console.log('Recipe updated successfully:', responseData);
                 alert('Recipe updated successfully');
+
+                loadHomePage();
+                showSection('home');
             } catch (error) {
                 console.error('Error updating recipe:', error);
                 alert('Error updating recipe');
@@ -1271,8 +1295,7 @@
                 alert('Select a recipe.');
             }
         }
-    
-
     </script>
 </body>
+
 </html>
