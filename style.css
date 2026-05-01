@@ -365,7 +365,7 @@ h5 {
     font-size: 20px;
     font-weight: bold;
     color: white;
-    position: sticky;
+    position: static;
     bottom: 0;
     padding: 10px 20px;
     margin: 0;

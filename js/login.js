@@ -16,12 +16,18 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
     .then(response => response.json())
     .then(data => {
         if (data.message === 'Login successful') {
-            // Store the userID in localStorage
             localStorage.setItem('userID', data.userID);
-            fetchUserRecipes(data.userID);
+
+            recipes = {};
+            populateRecipeList();
+            loadHomePage();
+
+            document.getElementById('navbar').style.display = 'block';
+            showSection('home');
+            document.querySelector('.wrapper').style.display = 'none';
         } else {
             alert('Invalid username or password');
-        }
+    }
     })
     .catch(error => {
         console.error('Error:', error);
@@ -56,7 +62,7 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
 });
 
 // Function to fetch user recipes and store in localStorage
-function fetchUserRecipes(userID) {
+/**function fetchUserRecipes(userID) {
     fetch('http://localhost:1337/api/userRecipe', {
         method: 'POST',
         headers: {
@@ -67,18 +73,23 @@ function fetchUserRecipes(userID) {
     .then(response => response.json())
     .then(data => {
         // Store recipes in localStorage
-        localStorage.setItem('recipes', JSON.stringify(data));
-        
-        // Switch to home navbar
+    if (data.message === 'Login successful') {
+        localStorage.setItem('userID', data.userID);
+
+        loadHomePage();
+
         document.getElementById('navbar').style.display = 'block';
         showSection('home');
         document.querySelector('.wrapper').style.display = 'none';
+    } else {
+    alert('Invalid username or password');
+}
     })
     .catch(error => {
         console.error('Error fetching recipes:', error);
         alert('Error fetching recipes');
     });
-}
+}*/
 
 // Sign Up
 document.getElementById('signupForm').addEventListener('submit', function (event) {

@@ -108,9 +108,10 @@ app.post('/api/userRecipe', (req, res) => {
             r.recipeName, 
             r.description
         FROM recipe r
+        WHERE r.userID = ?
     `;
     
-    connection.query(query, (err, recipes) => {
+    connection.query(query, [userID], (err, recipes) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ message: 'Failed to fetch recipes' });

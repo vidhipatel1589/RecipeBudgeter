@@ -478,12 +478,19 @@
 
 
         function showLogin() {
+            localStorage.removeItem('userID');
+            localStorage.removeItem('recipes');
+
+            recipes = {};
+            populateRecipeList();
+
+            document.getElementById('recipeCostDetailsHome').style.display = 'none';
             document.getElementById('signupWrapper').style.display = 'none';
             document.querySelector('.wrapper').style.display = 'block';
             document.getElementById('navbar').style.display = 'none';
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
-        }
+}
 
         function showSignup() {
             document.querySelector('.wrapper').style.display = 'none';
@@ -586,7 +593,7 @@
                     if (inventoryItem) {
                         const pricePerUnit = parseFloat(inventoryItem.price);
                         const size = parseFloat(inventoryItem.size);
-                        const pricePerSize = (pricePerUnit / size).toFixed(2);
+                        const pricePerSize = (pricePerUnit / size).toFixed(4);
 
                         row.innerHTML = `
                             <td>${ingredient.ingredient}</td>
